@@ -3,16 +3,23 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@emotion/core": "^10.0.7",
-    "@emotion/styled": "^10.0.7",
+    "@material-ui/core": "^3.9.2",
+    "jss": "^9.8.7",
+    "mobx": "^5.9.0",
+    "mobx-react": "^5.4.3",
+    "react": "^16.8.3",
+    "react-dom": "^16.8.3",
+    "react-jss": "^8.6.1",
+    "react-scripts": "2.1.5",
+    "typeface-roboto": "0.0.54",
+    "typescript": "3.3.3333"
+  },
+  "devDependencies": {
     "@types/jest": "24.0.6",
     "@types/node": "11.9.4",
     "@types/react": "16.8.4",
     "@types/react-dom": "16.8.2",
-    "react": "^16.8.3",
-    "react-dom": "^16.8.3",
-    "react-scripts": "2.1.5",
-    "typescript": "3.3.3333"
+    "@types/react-jss": "^8.6.2"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -29,7 +36,5 @@
     "not ie <= 11",
     "not op_mini all"
   ],
-  "devDependencies": {
-    "@types/styled-components": "^4.1.10"
-  }
+  "proxy": "http://localhost:5000"
 }

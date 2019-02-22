@@ -13,10 +13,10 @@ const app = express();
 
 	app.use(cookieParser());
 
-	app.use(bodyParser.json());
 	app.use(bodyParser.urlencoded({
-		extended: false
+		extended: true
 	}));
+	app.use(bodyParser.json());
 
 	const SequelizeStore = require("connect-session-sequelize")(session.Store);
 
@@ -41,14 +41,19 @@ const app = express();
 	app.use("/search", require("./routes/search"));
 	app.use("/control", require("./routes/control"));
 	app.use("/volume", require("./routes/volume"));
+	app.use("/account", require("./routes/account"));
 
 	app.use(async (error, req, res, next) => {
 		if(error instanceof APIError) {
-			res.status(error.getStatus()).send(error.message);
+			res.status(error.getStatus()).send(error.toJSON());
 		} else {
 			console.error(error);
 			const logged = await database.logAction(req, "websiteError")
-			res.status(500).send("Internal server error. id: " + logged.id);
+
+			res.status(500).send({
+				message: "Internal server error",
+				id: logged.id,
+			});
 		}
 	})
 

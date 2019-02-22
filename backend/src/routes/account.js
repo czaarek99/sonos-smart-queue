@@ -13,11 +13,7 @@ function setLoggedIn(req, res, username, userId) {
 }
 
 router.put("/", async(req, res) => {
-	const { password, passwordRepeat, username } = req.body;
-
-	if(password !== passwordRepeat) {
-		throw new APIError(400, "Password and repeat are not the same");
-	}
+	const { password, username } = req.body;
 
 	throwIfNotValidPassword(password);
 	throwIfNotValidUsername(username);

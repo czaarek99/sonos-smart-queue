@@ -8,4 +8,11 @@ module.exports = class APIError extends Error {
 	getStatus() {
 		return this.status;
 	}
+
+	toJSON() {
+		return {
+			message: this.message,
+			status: this.status
+		}
+	}
 }
