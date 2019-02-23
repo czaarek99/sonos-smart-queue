@@ -1,13 +1,14 @@
 import React, { Component, ReactNode } from 'react';
 import Login from './pages/Login';
-import { CssBaseline, MuiThemeProvider, createStyles, withStyles, WithStyles } from '@material-ui/core';
+import { CssBaseline, MuiThemeProvider, createStyles, withStyles } from '@material-ui/core';
 import theme from '../theme';
 import JssProvider from 'react-jss/lib/JssProvider';
 import "typeface-roboto";
 import { LoginController } from '../controllers/LoginController';
 import { AuthenticationService } from '../services/AuthenticationService';
-import { Provider, inject } from 'mobx-react';
+import { Provider, inject, observer } from 'mobx-react';
 import { RootStore } from '../stores/RootStore';
+import SmartQueue from './pages/SmartQueue';
 
 const styles = createStyles({
 	"@global": {
@@ -29,6 +30,7 @@ const styles = createStyles({
 	}
 });
 
+@observer
 class App extends Component {
 
 	render() : ReactNode {
@@ -37,7 +39,7 @@ class App extends Component {
 		let content = null;
 
 		if(rootStore.authenticationStore.isLoggedIn()) {
-
+            content = <SmartQueue />;
 		} else {
 			content = <Login controller={new LoginController(rootStore)}/>;
 		}
@@ -46,6 +48,7 @@ class App extends Component {
 			<Provider rootStore={rootStore}>
 				<MuiThemeProvider theme={theme}>
 					<CssBaseline />
+                    {content}
 				</MuiThemeProvider>
 			</Provider>
 		)
