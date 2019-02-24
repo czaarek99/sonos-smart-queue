@@ -7,7 +7,8 @@ const styles = (theme: Theme) => createStyles({
     container: {
         minWidth: "200px",
         border: `2px solid ${theme.palette.primary.main}`,
-        borderRadius: "2px"
+        borderRadius: "2px",
+        margin: "10px"
     },
     speaker: {
         display: "flex",

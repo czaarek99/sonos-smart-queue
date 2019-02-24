@@ -40,6 +40,9 @@ dbExports.User = defineModel("User", {
     },
     password: {
         type: DataTypes.STRING
+    },
+    uuid: {
+        type: DataTypes.STRING
     }
 });
 
@@ -82,6 +85,27 @@ dbExports.QueuedSong = defineModel("QueuedSong", {
 });
 
 addDefaultUserAssociation(dbExports.QueuedSong);
+
+dbExports.RefreshToken = defineModel("RefreshToken", {
+    token: {
+        type: DataTypes.STRING
+    },
+	creationDate: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW
+    }
+});
+
+addDefaultUserAssociation(dbExports.RefreshToken);
+
+dbExports.AccessToken = defineModel("AccessToken", {
+    token: {
+        type: DataTypes.STRING
+    },
+    expirationDate: {
+        type: DataTypes.DATE
+    }
+})
 
 const Log = defineModel("Log", {
     action: {

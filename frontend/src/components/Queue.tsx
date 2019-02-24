@@ -1,16 +1,15 @@
 import React, { Component, ReactNode } from "react";
-import { createStyles, WithStyles, withStyles, ListItem, List } from "@material-ui/core";
+import { createStyles, WithStyles, withStyles, ListItem, List, Typography, Paper } from "@material-ui/core";
 import { IQueuedSong } from "../interfaces/services/QueueService";
 import Song from "./Song";
+import Heading from "./Heading";
+import Section from "./Section";
 
 interface IProps {
     queued: IQueuedSong[]
 }
 
 const styles = createStyles({
-    container: {
-        width: "100%"
-    },
     listItem: {
         padding: "0"
     }
@@ -27,12 +26,25 @@ class Queue extends Component<WithStyles<typeof styles> & IProps> {
                     <Song song={queueItem}/>
                 </ListItem>
             )
-        })
+        });
+
+        let content = null;
+        if(queuedItems.length > 0) {
+            content = <List>{queuedItems}</List>;
+        } else {
+            content = (
+                <Typography>
+                    Queue is empty!
+                </Typography>
+            )
+        }
 
         return (
-            <List className={classes.container}>
-                {queuedItems}
-            </List>
+            <Section header="Queue">
+                <List disablePadding={true}>
+                    {queuedItems}
+                </List>
+            </Section>
         )
     }
 }

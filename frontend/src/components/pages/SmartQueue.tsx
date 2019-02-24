@@ -7,35 +7,42 @@ import Queue from "../Queue";
 import { ISmartQueueController } from "../../interfaces/controllers/SmartQueueController";
 import GroupChooser from "../GroupChooser";
 import SpotifyBrowser from "../spotify/SpotifyBrowser";
+import { ISpotifyBrowserController } from "../../interfaces/controllers/SpotifyBrowserController";
+
+const GRID_GAP = "10px";
 
 const styles = (theme: Theme) => createStyles({
     container: {
         display: "grid",
-        gridTemplateColumns: "min-content 200px auto",
+        gridTemplateColumns: "min-content min-content auto",
         gridTemplateRows: "min-content auto",
         gridTemplateAreas: `
             "nav nav nav"
             "groups queue browse"
         `,
-        height: "100%"
+        height: "100%",
+        gridGap: GRID_GAP,
+        paddingBottom: GRID_GAP
     },
     queue: {
         gridArea: "queue",
-        borderLeft: `2px solid ${theme.palette.primary.main}`,
     },
     nav: {
         gridArea: "nav",
     },
     groups: {
-        gridArea: "groups"
+        gridArea: "groups",
+        marginLeft: GRID_GAP
     },
     browse: {
-        gridArea: "browse"
+        gridArea: "browse",
+        marginRight: GRID_GAP
     }
 })
 
 interface IProps {
-    controller: ISmartQueueController
+    controller: ISmartQueueController,
+    browserController: ISpotifyBrowserController
 }
 
 @observer
@@ -56,7 +63,7 @@ class SmartQueue extends Component<WithStyles<typeof styles> & IProps> {
                     <GroupChooser groups={controller.speakerGroups} onSelect={() => {}}/>
                 </div>
                 <div className={classes.browse}>
-                    <SpotifyBrowser />
+                    <SpotifyBrowser controller={this.props.browserController}/>
                 </div>
             </div>
         )

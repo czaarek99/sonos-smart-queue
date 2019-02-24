@@ -26,7 +26,7 @@ router.get("/list/:groupId", async (req, res) => {
             "artistName"
         ],
         where: {
-            groupId: req.params.groupId,
+            groupId: groupId,
             state: SONG_STATE.QUEUED,
             queueDate: {
                 [database.Sequelize.Op.gt]: today

@@ -2,6 +2,8 @@ const router = require("express-promise-router")();
 const database = require("../database");
 const APIError = require("../util/APIError");
 const bcrypt = require("bcrypt");
+const uuid4 = require("uuid/v4");
+
 const { throwIfNotValidPassword, throwIfNotValidUsername, throwIfNotStringOrEmpty } = require("../util/validation");
 
 function setLoggedIn(req, res, username, userId) {
@@ -32,7 +34,8 @@ router.put("/", async(req, res) => {
 
 	const newUser = await database.User.create({
 		username,
-		password: hashedPassword
+        password: hashedPassword,
+        uuid: uuid4() 
 	});
 
 	setLoggedIn(req, res, username, newUser.id);

@@ -44,7 +44,8 @@ const app = express();
 	app.use("/queue", require("./routes/queue"));
 	app.use("/search", require("./routes/search"));
 	app.use("/control", require("./routes/control"));
-	app.use("/volume", require("./routes/volume"));
+    app.use("/volume", require("./routes/volume"));
+    app.use("/spotify", require("./routes/spotify"));
 
 	app.use(async (error, req, res, next) => {
 		if(error instanceof APIError) {

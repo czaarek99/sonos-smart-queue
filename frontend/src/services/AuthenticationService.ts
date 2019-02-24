@@ -5,6 +5,7 @@ export class AuthenticationService implements IAuthenticationService {
 
     private async respond(response: Response) : Promise<IAuthResponse> {
 
+        //TODO: Make this detect between an execpted an unexpected error
         if(response.ok) {
             return {
                 success: true,

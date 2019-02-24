@@ -1,17 +1,21 @@
 import React, { Component, ReactNode } from "react";
-import { createStyles, ListItem, List, Typography, WithStyles, withStyles } from "@material-ui/core";
+import { createStyles, ListItem, List, Typography, WithStyles, withStyles, Paper } from "@material-ui/core";
 import { ISpeakerGroup } from "../interfaces/services/InfoService";
 import SpeakerGroup from "./SpeakerGroup";
+import Heading from "./Heading";
+import Section from "./Section";
 
 const styles = createStyles({
     heading: {
         textAlign: "center",
+        paddingBottom: "10px"
     },
     container: {
-        padding: "10px"
+        height: "100%"
     },
     speakerGroup: {
-        cursor: "pointer"
+        cursor: "pointer",
+        paddingTop: "0"
     }
 });
 
@@ -38,6 +42,7 @@ class GroupChooser extends Component<WithStyles<typeof styles> & IProps> {
             return (
                 <ListItem onClick={onClick} 
                     disableGutters={true} 
+                    key={index}
                     className={classes.speakerGroup}>
 
                     <SpeakerGroup groupName={"Group " + index} speakerNames={names} />
@@ -45,16 +50,12 @@ class GroupChooser extends Component<WithStyles<typeof styles> & IProps> {
             )
         });
 
-
         return (
-            <div className={classes.container} >
-                <Typography variant="h6" className={classes.heading}>
-                    Group Selection
-                </Typography>
+            <Section header="Group Selection">
                 <List disablePadding={true} >
                     {groups}
                 </List>
-            </div>
+            </Section>
         )
     }
 }

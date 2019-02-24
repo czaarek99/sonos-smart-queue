@@ -10,6 +10,7 @@ import { Provider, inject, observer } from 'mobx-react';
 import { RootStore } from '../stores/RootStore';
 import SmartQueue from './pages/SmartQueue';
 import { SmartQueueController } from '../controllers/SmartQueueController';
+import { SpotifyBrowserController } from '../controllers/SpotifyBrowserController';
 
 const styles = createStyles({
 	"@global": {
@@ -40,7 +41,10 @@ class App extends Component {
 		let content = null;
 
 		if(rootStore.authenticationStore.isLoggedIn()) {
-            content = <SmartQueue controller={new SmartQueueController(rootStore)}/>;
+            content = (
+                <SmartQueue controller={new SmartQueueController(rootStore)} 
+                    browserController={new SpotifyBrowserController(rootStore)}/>
+            )
 		} else {
 			content = <Login controller={new LoginController(rootStore)}/>;
 		}
