@@ -2,10 +2,12 @@ import { ISmartQueueController } from "../interfaces/controllers/SmartQueueContr
 import { observable } from "mobx";
 import { IRootStore } from "../interfaces/stores/RootStore";
 import { IQueuedSong } from "../interfaces/services/QueueService";
+import { ISpeakerGroup } from "../interfaces/services/InfoService";
 
 export class SmartQueueController implements ISmartQueueController {
 
     private readonly rootStore: IRootStore;
+    @observable public speakerGroups: ISpeakerGroup[] = [];
     @observable public queueItems: IQueuedSong[] = [];
     @observable public loading = true;
     @observable public groupId = "test";
@@ -17,6 +19,7 @@ export class SmartQueueController implements ISmartQueueController {
 
     private async load() {
         this.queueItems = await this.rootStore.services.queueService.getQueue(this.groupId);
+        this.speakerGroups = await this.rootStore.services.infoService.getGroups();
     }
     
 }

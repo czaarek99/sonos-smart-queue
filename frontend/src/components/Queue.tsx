@@ -1,7 +1,7 @@
 import React, { Component, ReactNode } from "react";
-import { createStyles, WithStyles, withStyles } from "@material-ui/core";
+import { createStyles, WithStyles, withStyles, ListItem, List } from "@material-ui/core";
 import { IQueuedSong } from "../interfaces/services/QueueService";
-import QueueItem from "./QueueItem";
+import Song from "./Song";
 
 interface IProps {
     queued: IQueuedSong[]
@@ -10,6 +10,9 @@ interface IProps {
 const styles = createStyles({
     container: {
         width: "100%"
+    },
+    listItem: {
+        padding: "0"
     }
 });
 
@@ -20,14 +23,16 @@ class Queue extends Component<WithStyles<typeof styles> & IProps> {
 
         const queuedItems = this.props.queued.map((queueItem, index) => {
             return (
-                <QueueItem song={queueItem} key={index} />
+                <ListItem key={index} className={classes.listItem}>
+                    <Song song={queueItem}/>
+                </ListItem>
             )
         })
 
         return (
-            <div className={classes.container}>
+            <List className={classes.container}>
                 {queuedItems}
-            </div>
+            </List>
         )
     }
 }

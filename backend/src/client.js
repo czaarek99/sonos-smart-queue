@@ -11,34 +11,53 @@ async function getMainDevice() {
     })
 }
 
+function getZoneMemberIP(zoneMember) {
+    return zoneMember.Location.replace("http://", "").replace(":1400/xml/device_description.xml", "");
+}
+
 async function getGroupedClients() {
     const mainDevice = await getMainDevice();
     const groups = await mainDevice.getAllGroups();
     const groupedDevices = new Map();
+
     for (const group of groups) {
-        let groupName = "";
+
+        const speakers = [];
         let coordinatorUrl = null;
-        const zoneMembers = group.ZoneGroupMember;
-        if (zoneMembers.length === 0) {
-            throw new Error(`Group with id: ${group.ID} has no zone members!`)
-        } else if (zoneMembers.length === 1) {
-            groupName = zoneMembers[0].ZoneName;
-        } else {
-            groupName = `${zoneMembers[0].ZoneName} + ${zoneMembers[1].ZoneName}`
-            if (zoneMembers.length > 2) {
-                groupName += " and more..."
+
+        if(typeof group.ZoneGroupMember === "object") {
+            const member = group.ZoneGroupMember;
+            coordinatorUrl = getZoneMemberIP(member);
+
+            speakers.push({
+                name: member.ZoneName,
+                id: member.UUID
+            });
+        } else if(Array.isArray(group.ZoneGroupMember)) {
+            const members = group.ZoneGroupMember;
+
+            for (const zoneMember of group.ZoneGroupMember) {
+                speakers.push({
+                    name: zoneMember.ZoneName,
+                    id: zoneMember.UUID
+                });
+
+                if (zoneMember.UUID === group.Coordinator) {
+                    coordinatorUrl = getZoneMemberIP(zoneMember);
+                    break;
+                }
             }
         }
-        for (const zoneMember of zoneMembers) {
-            if (zoneMember.UUID === group.Coordinator) {
-                coordinatorUrl = zoneMember.Location.replace("http://", "").replace(":1400/xml/device_description.xml", "")
-                break;
-            }
-        }
+
+
+
         if (coordinatorUrl === null) {
             throw new Error("Could not find coordinator in zone members")
         } else {
-            groupedDevices.set(group.ID, {groupName, coordinatorUrl})
+            groupedDevices.set(group.ID, {
+                speakers,
+                coordinatorUrl
+            })
         }
     }
     return groupedDevices;

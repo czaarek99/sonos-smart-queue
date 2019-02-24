@@ -1,5 +1,5 @@
 import React, { Component, ReactNode } from "react";
-import { ListItem, createStyles, WithStyles, withStyles } from "@material-ui/core";
+import { ListItem, createStyles, WithStyles, withStyles, Typography } from "@material-ui/core";
 import Album from "./Album";
 import { IQueuedSong } from "../interfaces/services/QueueService";
 
@@ -7,9 +7,6 @@ const ALBUM_SIZE = 70;
 const HALF_SIZE = ALBUM_SIZE / 2;
 
 const styles = createStyles({
-    listItem: {
-        padding: "0"
-    },
     container: {
         height: "100%",
         display: "grid",
@@ -37,31 +34,27 @@ interface IProps {
     song: IQueuedSong
 }
 
-class QueueItem extends Component<WithStyles<typeof styles> & IProps> {
+class Song extends Component<WithStyles<typeof styles> & IProps> {
 
     public render() : ReactNode {
         const classes = this.props.classes;
         const { albumArtUrl, name, artistName } = this.props.song;
 
         return (
-
-            <ListItem className={classes.listItem}>
-                <div className={classes.container}>
-                    <div className={classes.albumContainer}>
-                        <Album imgSrc={albumArtUrl} />
-                    </div>
-                    <p className={classes.songName}>
-                        {name}
-                    </p>
-                    <p className={classes.artistName}>
-                        {artistName}
-                    </p>
+            <div className={classes.container}>
+                <div className={classes.albumContainer}>
+                    <Album imgSrc={albumArtUrl} />
                 </div>
-
-            </ListItem>
+                <Typography className={classes.songName}>
+                    {name}
+                </Typography>
+                <Typography className={classes.artistName}>
+                    {artistName}
+                </Typography>
+            </div>
         )
     }
 
 }
 
-export default withStyles(styles)(QueueItem);
+export default withStyles(styles)(Song);

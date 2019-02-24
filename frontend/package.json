@@ -12,6 +12,7 @@
     "react-dom": "^16.8.3",
     "react-jss": "^8.6.1",
     "react-scripts": "2.1.5",
+    "spotify-web-api-node": "^4.0.0",
     "typeface-roboto": "0.0.54",
     "typescript": "3.3.3333"
   },
