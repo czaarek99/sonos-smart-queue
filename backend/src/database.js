@@ -9,7 +9,10 @@ const configuration = {
 const sequelize = new Sequelize("sonos",
     "artist", "gQ0WTGHCVWlJNCrpdAS8", configuration);
 
-const dbExports = {sequelize};
+const dbExports = {
+    sequelize,
+    Sequelize
+};
 
 function defineModel(name, columns) {
     Object.values(columns).forEach((column) => {
@@ -51,34 +54,34 @@ dbExports.QueuedSong = defineModel("QueuedSong", {
     groupId: {
 		type: DataTypes.STRING
     },
-    uri: {
+    spotifyId: {
         type: DataTypes.STRING,
     },
-	date: {
+    name: {
+        type: DataTypes.STRING,
+    },
+    artistName: {
+        type: DataTypes.STRING
+    },
+    albumName: {
+        type: DataTypes.STRING,
+    },
+    albumArtUrl: {
+        type: DataTypes.STRING
+    },
+	queueDate: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW
+    },
+    state: {
+        type: DataTypes.STRING
+    },
+    priority: {
+        type: DataTypes.INTEGER
     }
 });
 
 addDefaultUserAssociation(dbExports.QueuedSong);
-
-dbExports.PlayedSong = defineModel("PlayedSong", {
-    groupId: {
-		type: DataTypes.STRING
-    },
-    uri: {
-        type: DataTypes.STRING,
-    },
-	name: {
-		type: DataTypes.STRING
-	},
-	date: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
-    }
-});
-
-addDefaultUserAssociation(dbExports.PlayedSong);
 
 const Log = defineModel("Log", {
     action: {

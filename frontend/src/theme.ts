@@ -7,19 +7,11 @@ const palette = {
     secondary: {
         main: "#FFFFFF"
     },
-    background: {
-        default: "#FFFFFF"
-    }
 }
 
 export default createMuiTheme({
     palette,
-    overrides: {
-        MuiButton: {
-            root: {
-                backgroundColor: palette.primary.main,
-            },
-        }
+    typography: {
+        useNextVariants: true
     }
-    
 });

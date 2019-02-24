@@ -1,9 +1,5 @@
 import { IAuthenticationService, IAuthResponse } from "../interfaces/services/AuthenticationService";
-
-const headers = {
-    Accept: "application/json",
-    "Content-Type": "application/json"
-};
+import { FETCH_JSON_HEADERS } from "../constants";
 
 export class AuthenticationService implements IAuthenticationService {
 
@@ -29,7 +25,7 @@ export class AuthenticationService implements IAuthenticationService {
             body: JSON.stringify({
                 username, password
             }),
-            headers
+            headers: FETCH_JSON_HEADERS
         });
 
         return await this.respond(response);
@@ -41,7 +37,7 @@ export class AuthenticationService implements IAuthenticationService {
             body: JSON.stringify({
                 username, password
             }),
-            headers
+            headers: FETCH_JSON_HEADERS
         });
 
         return await this.respond(response);

@@ -49,7 +49,7 @@ function throwIfNotSonosGroupId(string) {
 	throwIfNotStringOrEmpty("groupId", string);
 
 	if(!strings.startsWith("RINCON_") || !string.includes(":")) {
-		throw new APIError(400, "groupId is includesd");
+		throw new APIError(400, "Bad group id");
 	}
 }
 

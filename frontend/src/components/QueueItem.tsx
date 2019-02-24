@@ -1,12 +1,7 @@
 import React, { Component, ReactNode } from "react";
 import { ListItem, createStyles, WithStyles, withStyles } from "@material-ui/core";
-import Album from "./components/Album";
-
-export interface IQueueItem {
-    artistName: string
-    songName: string
-    albumUrl: string
-}
+import Album from "./Album";
+import { IQueuedSong } from "../interfaces/services/QueueService";
 
 const ALBUM_SIZE = 70;
 const HALF_SIZE = ALBUM_SIZE / 2;
@@ -38,24 +33,28 @@ const styles = createStyles({
     },
 })
 
-interface IProps extends IQueueItem {}
+interface IProps {
+    song: IQueuedSong
+}
 
 class QueueItem extends Component<WithStyles<typeof styles> & IProps> {
 
     public render() : ReactNode {
         const classes = this.props.classes;
+        const { albumArtUrl, name, artistName } = this.props.song;
 
         return (
+
             <ListItem className={classes.listItem}>
                 <div className={classes.container}>
                     <div className={classes.albumContainer}>
-                        <Album imgSrc={this.props.albumUrl} />
+                        <Album imgSrc={albumArtUrl} />
                     </div>
                     <p className={classes.songName}>
-                        {this.props.songName}
+                        {name}
                     </p>
                     <p className={classes.artistName}>
-                        {this.props.artistName}
+                        {artistName}
                     </p>
                 </div>
 

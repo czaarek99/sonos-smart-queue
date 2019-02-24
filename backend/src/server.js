@@ -36,12 +36,15 @@ const app = express();
 		}
 	}))
 
+    app.use("/account", require("./routes/account"));
+
+    //TODO: Require a session for these
+
 	app.use("/info", require("./routes/info"));
 	app.use("/queue", require("./routes/queue"));
 	app.use("/search", require("./routes/search"));
 	app.use("/control", require("./routes/control"));
 	app.use("/volume", require("./routes/volume"));
-	app.use("/account", require("./routes/account"));
 
 	app.use(async (error, req, res, next) => {
 		if(error instanceof APIError) {

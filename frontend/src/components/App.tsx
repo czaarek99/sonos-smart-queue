@@ -9,6 +9,7 @@ import { AuthenticationService } from '../services/AuthenticationService';
 import { Provider, inject, observer } from 'mobx-react';
 import { RootStore } from '../stores/RootStore';
 import SmartQueue from './pages/SmartQueue';
+import { SmartQueueController } from '../controllers/SmartQueueController';
 
 const styles = createStyles({
 	"@global": {
@@ -39,7 +40,7 @@ class App extends Component {
 		let content = null;
 
 		if(rootStore.authenticationStore.isLoggedIn()) {
-            content = <SmartQueue />;
+            content = <SmartQueue controller={new SmartQueueController(rootStore)}/>;
 		} else {
 			content = <Login controller={new LoginController(rootStore)}/>;
 		}

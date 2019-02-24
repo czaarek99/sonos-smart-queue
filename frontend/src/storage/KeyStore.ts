@@ -6,12 +6,19 @@ export class KeyStore {
         this.path = path;
     }
 
-    setKeyValue(key: string, value: object) {
-        localStorage.setItem(key, JSON.stringify(value));
+    getFullPath(key: string) : string {
+        return `${this.path}.${key}`
+    }
+
+    setKeyValue(key: string, value: object) : void {
+        const fullPath = this.getFullPath(key);
+        localStorage.setItem(fullPath, JSON.stringify(value));
     }
 
     getKeyValue<T>(key: string) : T | null {
-        const item = localStorage.getItem(key);
+        const fullPath = this.getFullPath(key);
+
+        const item = localStorage.getItem(fullPath);
         if(item === null) {
             return null;
         }

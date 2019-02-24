@@ -1,34 +1,50 @@
 const router = require("express-promise-router")();
-const datbase = require("../database");
+const database = require("../database");
+const { throwIfNotSonosGroupId } = require("../util/validation");
 const { groupIdToSonos, spotifyUriToSonosUri } = require("../util/router");
 
 const MAX_QUEUE_RETURN = 50;
 
+const SONG_STATE = {
+    QUEUED: "queued",
+    STARTED_PLAYING: "started",
+    PLAYING: "playing",
+    FINISHED: "finished"
+};
+
 router.get("/list/:groupId", async (req, res) => {
-	//TOOD: Use internal queue
-	const sonos = await groupIdToSonos(req.params.groupId);
-	const queue = await sonos.getQueue();
+    const groupId = req.params.groupId;
+    //throwIfNotSonosGroupId(groupId);
 
-	if(queue === false) {
-		res.status(202).send({
-			total: 0,
-			returned: 0,
-			songs: []
-		});
-	} else {
-		const queuedSongs = queue.items.slice(0, MAX_QUEUE_RETURN);
+    const today = new Date(new Date().getTime() - (16 * 60 * 60 * 1000));
 
-		res.status(200).send({
-			total: parseInt(queue.total),
-			returned: queuedSongs.length,
-			songs: queuedSongs
-		});
+    const songs = await database.QueuedSong.findAll({
+        attributes: [
+            "name",
+            "albumName",
+            "albumArtUrl",
+            "artistName"
+        ],
+        where: {
+            groupId: req.params.groupId,
+            state: SONG_STATE.QUEUED,
+            queueDate: {
+                [database.Sequelize.Op.gt]: today
+            }
+        },
+        order: [
+            ["priority", "DESC"]
+        ]
+    });
 
-	}
+    return res.status(200).send(songs);
 });
 
-router.put("/add", async (req, res) => {
-	const { groupId, uri } = req.body;
+router.put("/add/:groupId", async (req, res) => {
+    const groupId = req.params.groupId;
+    throwIfNotSonosGroupId(groupId);
+
+    const songId = req.body.songId;
 });
 
 module.exports = router;
