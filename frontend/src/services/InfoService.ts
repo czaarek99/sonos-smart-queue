@@ -1,14 +1,10 @@
 import { IInfoService, ISpeakerGroup } from "../interfaces/services/InfoService";
-import { FETCH_JSON_HEADERS } from "../constants";
+import { request } from "./Client";
 
 export class InfoService implements IInfoService {
 
     public async getGroups() : Promise<ISpeakerGroup[]> {
-        const response = await fetch("/info/groups", {
-            method: "GET",
-            headers: FETCH_JSON_HEADERS
-        });
-
+        const response = await request("/info/groups", "GET");
         return await response.json();
     }
 

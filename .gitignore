@@ -6,6 +6,6 @@ package-lock.json
 .vs
 .idea
 
-ngrok.exe
+ngrok*
 
 *.vim

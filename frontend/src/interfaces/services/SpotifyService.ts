@@ -1,4 +1,9 @@
+export interface IAccessToken {
+    token: string,
+    expiresIn: number
+}
+
 export interface ISpotifyService {
-    hasSpotifyLink: () => Promise<boolean>
+    getAccessToken: () => Promise<IAccessToken>
     getSpotifyAuthUrl: () => Promise<string>
 }

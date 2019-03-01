@@ -57,7 +57,6 @@ class Login extends Component<WithStyles<typeof styles> & IProps> {
                         onChange={(event) => { controller.onChange("username", event.target.value)}}
                         value={controller.model.username}
                         error={hasError}
-                        defaultValue="Username"
                         label="Username"
                         required={true} 
                         disabled={controller.loading}
@@ -66,7 +65,6 @@ class Login extends Component<WithStyles<typeof styles> & IProps> {
                         onChange={(event) => { controller.onChange("password", event.target.value)}}
                         value={controller.model.password}
                         error={hasError}
-                        defaultValue="Password"
                         label="Password"
                         required={true}
                         disabled={controller.loading}

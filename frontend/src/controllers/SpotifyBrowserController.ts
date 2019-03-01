@@ -1,24 +1,26 @@
 import { ISpotifyBrowserController, BrowserState } from "../interfaces/controllers/SpotifyBrowserController";
 import { observable } from "mobx";
 import { IRootStore } from "../interfaces/stores/RootStore";
+import { IAccessToken } from "../interfaces/services/SpotifyService";
 
 export class SpotifyBrowserController implements ISpotifyBrowserController {
 
-    private readonly rootStore: IRootStore;
+    @observable private readonly rootStore: IRootStore;
     @observable public state = BrowserState.NOT_LINKED;
     @observable public loading = true;
+    private accessToken: IAccessToken = null;
 
     constructor(rootStore: IRootStore) {
         this.rootStore = rootStore;
-
         this.load();
     }
 
     private async load() {
-        const hasLink = await this.rootStore.services.spotifyService.hasSpotifyLink();
-
-        if(hasLink) {
+        try {
+            this.accessToken = await this.rootStore.services.spotifyService.getAccessToken();
             this.state = BrowserState.LINKED;
+        } catch(error) {
+            this.state = BrowserState.NOT_LINKED;
         }
 
         this.loading = false;

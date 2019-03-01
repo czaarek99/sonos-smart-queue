@@ -3,28 +3,20 @@ import { AbstractStore } from "./AbstractStore";
 import { KeyStore } from "../storage/KeyStore";
 import { IAuthenticationStore } from "../interfaces/stores/AuthenticationStore";
 
-const LOGGED_IN_KEY = "loggedIn";
-
-interface IAuthStorage {
-    isLoggedIn: boolean
+interface IAuthInfo {
+    loggedIn: boolean
 }
 
 export class AuthenticationStore extends AbstractStore implements IAuthenticationStore {
 
-    private readonly localStore = new KeyStore("auth");
+    private readonly clientSession = new KeyStore<IAuthInfo>(sessionStorage, "auth");
 
     public isLoggedIn() : boolean {
-        const value = this.localStore.getKeyValue<IAuthStorage>(LOGGED_IN_KEY)
-        if(value === null) {
-            return false;
-        }
-
-        return value.isLoggedIn;
+        const value = this.clientSession.getKeyValue("loggedIn");
+        return value === null ? false : value === "true";
     }
 
     public setLoggedIn(isLoggedIn: boolean) : void {
-        this.localStore.setKeyValue(LOGGED_IN_KEY, {
-            isLoggedIn
-        })
+        this.clientSession.setKeyValue("loggedIn", isLoggedIn.toString())
     }
 }

@@ -1,9 +1,4 @@
-export interface IAuthResponse {
-    success: boolean,
-    error: string
-}
-
-type AuthFunction = (username: string, password: string) => Promise<IAuthResponse>
+type AuthFunction = (username: string, password: string) => Promise<void>
 
 export interface IAuthenticationService {
     logIn: AuthFunction

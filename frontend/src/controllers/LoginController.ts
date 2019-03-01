@@ -5,12 +5,13 @@ import { ILoginModel } from "../interfaces/models/LoginModel";
 import { IAuthenticationService } from "../interfaces/services/AuthenticationService";
 import { IAuthenticationStore } from "../interfaces/stores/AuthenticationStore";
 import { IRootStore } from "../interfaces/stores/RootStore";
+import { HttpError } from "../services/Client";
 
 export class LoginController implements ILoginController {
 
     private readonly rootStore: IRootStore;
     private readonly authenticationService: IAuthenticationService;
-    @observable public error : string = "";
+    @observable public error = "";
     @observable public model = new LoginModel();
     @observable public loading = false;
 
@@ -30,12 +31,11 @@ export class LoginController implements ILoginController {
     public async onLogin() {
         this.loading = true;
 
-        const response = await this.authenticationService.logIn(this.model.username, this.model.password);
-
-        if(response.success) {
+        try {
+            await this.authenticationService.logIn(this.model.username, this.model.password);
             this.setLoggedIn();
-        } else {
-            this.error = response.error;
+        } catch(error) {
+            this.error = error.message;
         }
 
         this.loading = false;
@@ -44,14 +44,11 @@ export class LoginController implements ILoginController {
     public async onRegister() {
         this.loading = true;
 
-        const response = await this.authenticationService.register(this.model.username, this.model.password);
-
-        if(response.success) {
+        try {
+            await this.authenticationService.register(this.model.username, this.model.password);
             this.setLoggedIn();
-        } else {
-            this.error = response.error;
+        } catch(error) {
+            this.error = error.message;
         }
-
-        this.loading = false;
     }
 }

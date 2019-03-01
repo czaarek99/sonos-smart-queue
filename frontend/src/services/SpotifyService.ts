@@ -1,26 +1,16 @@
-import { ISpotifyService } from "../interfaces/services/SpotifyService";
+import { ISpotifyService, IAccessToken } from "../interfaces/services/SpotifyService";
 import { FETCH_JSON_HEADERS } from "../constants";
+import { request } from "./Client";
 
 export class SpotifyService implements ISpotifyService {
 
-    public async hasSpotifyLink() : Promise<boolean> {
-        const response = await fetch("/spotify/link", {
-            method: "GET",
-            headers: FETCH_JSON_HEADERS
-        });
-
-        const data = await response.json();
-        return data.exists;
+    public async getAccessToken() : Promise<IAccessToken> {
+        const response = await request("/spotify/token", "GET");
+        return await response.json();
     }
-
 
     public async getSpotifyAuthUrl() : Promise<string> {
-        const response = await fetch("/spotify/authUrl", {
-            method: "GET",
-            headers: FETCH_JSON_HEADERS
-        });
-
+        const response = await request("/spotify/authUrl", "GET");
         return await response.text();
     }
-
 }

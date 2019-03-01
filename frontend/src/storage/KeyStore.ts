@@ -1,29 +1,29 @@
-export class KeyStore {
+import { observable } from "mobx";
 
+export class KeyStore<T> {
+
+    private readonly implementation: Storage;
     private readonly path: string;
+    @observable private version = 0;
 
-    constructor(path: string) {
+    constructor(implementation: Storage, path: string) {
+        this.implementation = implementation;
         this.path = path;
     }
 
-    getFullPath(key: string) : string {
+    private getFullPath(key: string) : string {
         return `${this.path}.${key}`
     }
 
-    setKeyValue(key: string, value: object) : void {
-        const fullPath = this.getFullPath(key);
-        localStorage.setItem(fullPath, JSON.stringify(value));
+    public setKeyValue(key: keyof T, value: string) : void {
+        const fullPath = this.getFullPath(key.toString());
+        this.implementation.setItem(fullPath, value);
+        this.version++;
     }
 
-    getKeyValue<T>(key: string) : T | null {
-        const fullPath = this.getFullPath(key);
-
-        const item = localStorage.getItem(fullPath);
-        if(item === null) {
-            return null;
-        }
-
-        return JSON.parse(item);
+    public getKeyValue(key: keyof T) : string {
+        const fullPath = this.getFullPath(key.toString());
+        return this.implementation.getItem(fullPath);
     }
 
 }

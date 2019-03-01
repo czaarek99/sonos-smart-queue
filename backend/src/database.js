@@ -98,15 +98,6 @@ dbExports.RefreshToken = defineModel("RefreshToken", {
 
 addDefaultUserAssociation(dbExports.RefreshToken);
 
-dbExports.AccessToken = defineModel("AccessToken", {
-    token: {
-        type: DataTypes.STRING
-    },
-    expirationDate: {
-        type: DataTypes.DATE
-    }
-})
-
 const Log = defineModel("Log", {
     action: {
         type: DataTypes.STRING(70)

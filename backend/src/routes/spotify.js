@@ -6,11 +6,12 @@ const { throwIfNotStringOrEmpty } = require("../util/validation");
 
 const scopes = ["playlist-read-private", "playlist-read-collaborative", "user-read-email"];
 
-function getBaseClient() {
+function getBaseClient(options = {}) {
     return new SpotifyWebApi({
         redirectUri: "http://00d45574.ngrok.io/spotify/link",
         clientId: "66587271d5af4788852dbfe82a7d6364",
-        clientSecret: "3d1928dbe3af4423a39a54f747287263"
+        clientSecret: "3d1928dbe3af4423a39a54f747287263",
+        ...options
     });
 }
 
@@ -54,24 +55,12 @@ router.get("/redirect", async(req, res) => {
             userId: user.id
         });
 
-        await createAccessToken(data);
+        res.status(200).send(200);
     }
 
 });
 
-async function createAccessToken(data) {
-    //Lets refresh these a minute early
-    const expiresInSeconds = data.expires_in - 60;
-    const expirationDate = new Date();
-    expirationDate.setSeconds(expirationDate.getSeconds() + expiresInSeconds);
-
-    await database.AccessToken.create({
-        token: data.access_token,
-        expirationDate
-    });
-}
-
-router.get("/link", async (req, res) => {
+router.get("/token", async (req, res) => {
     const refreshToken = await database.RefreshToken.findOne({
         where: {
             userId: req.session.userId
@@ -79,27 +68,21 @@ router.get("/link", async (req, res) => {
     });
 
     if(refreshToken === null) {
-        return res.status(404).send({
-            exists: false
-        });
+        return res.status(404).send();
     }
 
-    const client = getBaseClient();
-    client.setRefreshToken(refreshToken);
+    const client = getBaseClient({
+        refreshToken: refreshToken.token
+    });
 
     try {
         const data = await client.refreshAccessToken();
-        await createAccessToken(data);
-
         res.status(200).send({
-            exists: true
+            token: data.body.access_token,
+            expiresIn: data.body.expies_in / 2
         });
     } catch(error) {
-        //TODO: Handle this properly
-        console.error(error);
-        res.status(404).send({
-            exists: false
-        });
+        res.status(401).send();
     }
 });
 
