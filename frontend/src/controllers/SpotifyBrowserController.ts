@@ -30,7 +30,9 @@ export class SpotifyBrowserController implements ISpotifyBrowserController {
         const url = await this.rootStore.services.spotifyService.getSpotifyAuthUrl();
         this.state = BrowserState.LINKING;
 
-        window.open(url);
+        window.location.replace(url)
+        //window.open(url);
+        //window.open(url, "Spotify Authentication", "height=400,width=350");
     }
 
 }

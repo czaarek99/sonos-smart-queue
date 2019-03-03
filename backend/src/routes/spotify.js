@@ -3,14 +3,15 @@ const SpotifyWebApi = require("spotify-web-api-node");
 const database = require("../database");
 const APIError = require("../util/APIError");
 const { throwIfNotStringOrEmpty } = require("../util/validation");
+const { spotifyQueueSecret, isProduction } = require("../config");
 
 const scopes = ["playlist-read-private", "playlist-read-collaborative", "user-read-email"];
 
 function getBaseClient(options = {}) {
     return new SpotifyWebApi({
-        redirectUri: "http://00d45574.ngrok.io/spotify/link",
+        redirectUri: "https://b9295f5e.ngrok.io/spotify/redirect",
         clientId: "66587271d5af4788852dbfe82a7d6364",
-        clientSecret: "3d1928dbe3af4423a39a54f747287263",
+        clientSecret: spotifyQueueSecret,
         ...options
     });
 }
@@ -51,16 +52,20 @@ router.get("/redirect", async(req, res) => {
         const data = await client.authorizationCodeGrant(code);
 
         await database.RefreshToken.create({
-            token: data.refresh_token,
+            token: data.body.refresh_token,
             userId: user.id
         });
 
-        res.status(200).send(200);
+        if(isProduction) {
+            res.redirect("/");
+        } else {
+            res.redirect("http://localhost:3000")
+        }
     }
 
 });
 
-router.get("/token", async (req, res) => {
+router.use(async (req, res, next) => {
     const refreshToken = await database.RefreshToken.findOne({
         where: {
             userId: req.session.userId
@@ -68,11 +73,16 @@ router.get("/token", async (req, res) => {
     });
 
     if(refreshToken === null) {
-        return res.status(404).send();
+        throw new APIError(404, "No refresh token found");
     }
 
+    res.locals.refreshToken = refreshToken.token
+    await next();
+});
+
+router.get("/token", async (req, res) => {
     const client = getBaseClient({
-        refreshToken: refreshToken.token
+        refreshToken: res.locals.refreshToken
     });
 
     try {
@@ -82,8 +92,27 @@ router.get("/token", async (req, res) => {
             expiresIn: data.body.expies_in / 2
         });
     } catch(error) {
-        res.status(401).send();
+        throw new APIError(401, "Could not refresh access token")
     }
+});
+
+router.get("/search/:query", async(req, res) => {
+    const accessToken = req.query.accessToken;
+    throwIfNotStringOrEmpty(accessToken);
+    const query = req.params.query;
+    throwIfNotStringOrEmpty(query);
+
+    const client = getBaseClient({
+        refreshToken: res.locals.refreshToken,
+        accessToken
+    });
+
+    const response = await client.search(query, ["album, artist, playlist, track"], {
+        limit: 50
+    });
+
+    res.status(200).send(response);
+
 });
 
 module.exports = router;
