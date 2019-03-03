@@ -89,7 +89,7 @@ router.get("/token", async (req, res) => {
         const data = await client.refreshAccessToken();
         res.status(200).send({
             token: data.body.access_token,
-            expiresIn: data.body.expies_in / 2
+            expiresIn: data.body.expires_in / 2
         });
     } catch(error) {
         throw new APIError(401, "Could not refresh access token")
@@ -98,16 +98,16 @@ router.get("/token", async (req, res) => {
 
 router.get("/search/:query", async(req, res) => {
     const accessToken = req.query.accessToken;
-    throwIfNotStringOrEmpty(accessToken);
+    throwIfNotStringOrEmpty("accessToken", accessToken);
     const query = req.params.query;
-    throwIfNotStringOrEmpty(query);
+    throwIfNotStringOrEmpty("query", query);
 
     const client = getBaseClient({
         refreshToken: res.locals.refreshToken,
         accessToken
     });
 
-    const response = await client.search(query, ["album, artist, playlist, track"], {
+    const response = await client.search(query, ["album", "artist", "track", "playlist"], {
         limit: 50
     });
 

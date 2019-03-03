@@ -26,4 +26,8 @@ export class KeyStore<T> {
         return this.implementation.getItem(fullPath);
     }
 
+    public clearKeyValue(key: keyof T) : void {
+        this.implementation.removeItem(key.toString());
+    }
+
 }

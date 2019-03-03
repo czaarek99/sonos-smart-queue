@@ -5,7 +5,9 @@ export enum BrowserState {
 }
 
 export interface ISpotifyBrowserController {
-    readonly state: BrowserState;
-    readonly loading: boolean;
+    readonly state: BrowserState
+    readonly loading: boolean
+    readonly searchQuery: string
     onLink: () => Promise<void>
+    onSearch: (query: string) => Promise<void>
 }

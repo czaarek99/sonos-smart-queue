@@ -22,6 +22,7 @@ const styles = createStyles({
         width: "100%"
     },
     spotifySearch: {
+        width: "100%"
     },
     searchInputContainer: {
         display: "flex"
@@ -40,10 +41,11 @@ class SpotifyBrowser extends Component<WithStyles<typeof styles> & IProps> {
 
         return (
             <div className={classes.linkedContent}>
-                <div>
-                    <TextField label="Search spotify" type="search" className={classes.spotifySearch}/>
-                    <SearchIcon />
-                </div>
+                <TextField label="Search spotify"
+                    value={controller.searchQuery}
+                    onChange={event => controller.onSearch(event.target.value)}
+                    type="search" 
+                    className={classes.spotifySearch}/>
             </div>
         )
     }

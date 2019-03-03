@@ -12,6 +12,10 @@ interface IProps {
 const styles = createStyles({
     listItem: {
         padding: "0"
+    },
+    queueText: {
+        width: "270px",
+        textAlign: "center"
     }
 });
 
@@ -30,10 +34,14 @@ class Queue extends Component<WithStyles<typeof styles> & IProps> {
 
         let content = null;
         if(queuedItems.length > 0) {
-            content = <List>{queuedItems}</List>;
+            content = (
+                <List disablePadding={true}>
+                    {queuedItems}
+                </List>
+            )
         } else {
             content = (
-                <Typography>
+                <Typography className={classes.queueText}>
                     Queue is empty!
                 </Typography>
             )
@@ -41,9 +49,7 @@ class Queue extends Component<WithStyles<typeof styles> & IProps> {
 
         return (
             <Section header="Queue">
-                <List disablePadding={true}>
-                    {queuedItems}
-                </List>
+                {content}
             </Section>
         )
     }

@@ -13,4 +13,12 @@ export class SpotifyService implements ISpotifyService {
         const response = await request("/spotify/authUrl", "GET");
         return await response.text();
     }
+
+    public async search(query: string, token: string) : Promise<any> {
+        const params = new URLSearchParams();
+        params.append("accessToken", token);
+
+        const response = await request(`/spotify/search/${query}?${params.toString()}`, "GET");
+        return response.text();
+    }
 }
