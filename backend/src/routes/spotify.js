@@ -3,13 +3,13 @@ const SpotifyWebApi = require("spotify-web-api-node");
 const database = require("../database");
 const APIError = require("../util/APIError");
 const { throwIfNotStringOrEmpty } = require("../util/validation");
-const { spotifyQueueSecret, isProduction } = require("../config");
+const { spotifyQueueSecret, spotifyRedirectUri,isProduction } = require("../config");
 
 const scopes = ["playlist-read-private", "playlist-read-collaborative", "user-read-email"];
 
 function getBaseClient(options = {}) {
     return new SpotifyWebApi({
-        redirectUri: "https://b9295f5e.ngrok.io/spotify/redirect",
+        redirectUri: `${spotifyRedirectUri}/spotify/redirect`,
         clientId: "66587271d5af4788852dbfe82a7d6364",
         clientSecret: spotifyQueueSecret,
         ...options

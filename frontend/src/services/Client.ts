@@ -1,13 +1,18 @@
 import { FETCH_JSON_HEADERS } from "../constants";
 
-export class HttpError {
+interface IDefaultErrorBody {
+    message: string
+    status: number
+}
+
+export class HttpError<T = IDefaultErrorBody> {
 
     public readonly statusCode: number;
-    public readonly message: string;
+    public readonly body: T;
 
-    constructor(statusCode: number, message: string) {
+    constructor(statusCode: number, body: T) {
         this.statusCode = statusCode;
-        this.message = message;
+        this.body = body;
     }
 
 }

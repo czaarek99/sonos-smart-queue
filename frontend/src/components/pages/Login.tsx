@@ -1,5 +1,5 @@
 import React, { Component, ReactNode } from "react";
-import { Input, Button, withStyles, createStyles, WithStyles, FormHelperText, TextField, Paper, Theme } from "@material-ui/core";
+import { Input, Button, withStyles, createStyles, WithStyles, FormHelperText, TextField, Paper, Theme, Typography } from "@material-ui/core";
 import { ILoginController } from "../../interfaces/controllers/LoginController";
 import { observer } from "mobx-react";
 
@@ -45,7 +45,9 @@ class Login extends Component<WithStyles<typeof styles> & IProps> {
         if(hasError) {
             errorMessage = (
                 <Paper className={classes.errorMessage}>
-                    <p>{controller.error}</p>
+                    <Typography>
+                        {controller.error}
+                    </Typography>
                 </Paper>
             )
         }
@@ -66,6 +68,7 @@ class Login extends Component<WithStyles<typeof styles> & IProps> {
                         value={controller.model.password}
                         error={hasError}
                         label="Password"
+                        type="password"
                         required={true}
                         disabled={controller.loading}
                         fullWidth={true} />

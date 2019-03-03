@@ -1,4 +1,5 @@
 module.exports = {
     spotifyQueueSecret: process.env.SPOTIFY_QUEUE_SECRET,
-    isProduction: process.env.NODE_ENV === "production"
+    spotifyRedirectUri: process.env.SPOTIFY_REDIRECT_URI,
+    isProduction: process.env.NODE_ENV === "production",
 }

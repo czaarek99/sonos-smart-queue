@@ -1,6 +1,6 @@
 import React, { Component, ReactNode } from 'react';
 import Login from './pages/Login';
-import { CssBaseline, MuiThemeProvider, createStyles, withStyles } from '@material-ui/core';
+import { CssBaseline, MuiThemeProvider, createStyles, withStyles, WithStyles } from '@material-ui/core';
 import theme from '../theme';
 import JssProvider from 'react-jss/lib/JssProvider';
 import "typeface-roboto";
@@ -11,6 +11,10 @@ import { RootStore } from '../stores/RootStore';
 import SmartQueue from './pages/SmartQueue';
 import { SmartQueueController } from '../controllers/SmartQueueController';
 import { SpotifyBrowserController } from '../controllers/SpotifyBrowserController';
+import { IAppController } from '../interfaces/controllers/AppController';
+import { IRootStore } from '../interfaces/stores/RootStore';
+import { AppController } from '../controllers/AppController';
+import { observable } from 'mobx';
 
 const styles = createStyles({
 	"@global": {
@@ -32,25 +36,35 @@ const styles = createStyles({
 	}
 });
 
+interface IProps {}
+
 @observer
-class App extends Component {
+class App extends Component<IProps & WithStyles<typeof styles>> {
+
+    @observable private readonly controller: IAppController;
+    private readonly rootStore: IRootStore;
+
+    constructor(props) {
+        super(props);
+
+        this.rootStore = new RootStore();
+        this.controller = new AppController(this.rootStore);
+    }
 
 	render() : ReactNode {
-		const rootStore = new RootStore();
-
 		let content = null;
 
-		if(rootStore.authenticationStore.isLoggedIn()) {
+		if(this.controller.loggedIn) {
             content = (
-                <SmartQueue controller={new SmartQueueController(rootStore)} 
-                    browserController={new SpotifyBrowserController(rootStore)}/>
+                <SmartQueue controller={new SmartQueueController(this.rootStore)} 
+                    browserController={new SpotifyBrowserController(this.rootStore)}/>
             )
 		} else {
-			content = <Login controller={new LoginController(rootStore)}/>;
+			content = <Login controller={new LoginController(this.rootStore, this.controller)}/>;
 		}
 
 		return (
-			<Provider rootStore={rootStore}>
+			<Provider rootStore={this.rootStore}>
 				<MuiThemeProvider theme={theme}>
 					<CssBaseline />
                     {content}

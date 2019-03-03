@@ -67,6 +67,14 @@ router.post("/login", async(req, res) => {
 	} else {
 		throwBadDetails();
 	}
-})
+});
+
+router.get("/loginStatus", async (req, res) => {
+    if(req.session && req.session.loggedIn) {
+        res.status(200).send("loggedIn")
+    } else {
+        res.status(200).send("loggedOut")
+    }
+});
 
 module.exports = router;
