@@ -1,19 +1,30 @@
 import React, { Component, ReactNode } from "react";
-import { Paper, Typography, Button, createStyles, WithStyles, withStyles, CircularProgress } from "@material-ui/core";
+import { Paper, Typography, Button, createStyles, WithStyles, withStyles, CircularProgress, TextField } from "@material-ui/core";
 import { ISpotifyBrowserController, BrowserState } from "../../interfaces/controllers/SpotifyBrowserController";
 import Section from "../Section";
 import { observer } from "mobx-react";
+import SearchIcon from "@material-ui/icons/Search";
 
 const styles = createStyles({
     content: {
         height: "100%",
         display: "flex",
         alignItems: "center",
-        justifyContent: "center"
+        justifyContent: "center",
+        padding: "10px"
     },
     linkPaper: {
         padding: "5px",
         textAlign: "center"
+    },
+    linkedContent: {
+        height: "100%",
+        width: "100%"
+    },
+    spotifySearch: {
+    },
+    searchInputContainer: {
+        display: "flex"
     }
 });
 
@@ -25,7 +36,16 @@ interface IProps {
 class SpotifyBrowser extends Component<WithStyles<typeof styles> & IProps> {
 
     private getLinkedContent() : ReactNode {
-        return <div></div>;
+        const { classes, controller } = this.props;
+
+        return (
+            <div className={classes.linkedContent}>
+                <div>
+                    <TextField label="Search spotify" type="search" className={classes.spotifySearch}/>
+                    <SearchIcon />
+                </div>
+            </div>
+        )
     }
 
     private getNotLinkedContent() : ReactNode {
@@ -53,7 +73,7 @@ class SpotifyBrowser extends Component<WithStyles<typeof styles> & IProps> {
         return (
             <Paper>
                 <Typography>
-                    Please use the popup to authenticate.
+                    Redirecting to spotify for authentication...
                 </Typography>
             </Paper>
         )
