@@ -114,7 +114,7 @@ router.get("/search/:query", async(req, res) => {
         limit: 50
     });
 
-    res.status(200).send(response);
+    res.status(200).send(response.body);
 
 });
 

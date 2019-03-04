@@ -1,9 +1,10 @@
 import React, { Component, ReactNode } from "react";
-import { Paper, Typography, Button, createStyles, WithStyles, withStyles, CircularProgress, TextField } from "@material-ui/core";
+import { Paper, Typography, Button, createStyles, WithStyles, withStyles, CircularProgress, TextField, List, ListItem } from "@material-ui/core";
 import { ISpotifyBrowserController, BrowserState } from "../../interfaces/controllers/SpotifyBrowserController";
 import Section from "../Section";
 import { observer } from "mobx-react";
 import SearchIcon from "@material-ui/icons/Search";
+import Song from "../Song";
 
 const styles = createStyles({
     content: {
@@ -26,6 +27,9 @@ const styles = createStyles({
     },
     searchInputContainer: {
         display: "flex"
+    },
+    resultListItem: {
+        padding: 0
     }
 });
 
@@ -39,6 +43,19 @@ class SpotifyBrowser extends Component<WithStyles<typeof styles> & IProps> {
     private getLinkedContent() : ReactNode {
         const { classes, controller } = this.props;
 
+        let results = null;
+        if(controller.searchResult) {
+            results = controller.searchResult.tracks.items.map((track) => {
+                return (
+                    <ListItem className={classes.resultListItem} key={track.id}>
+                        <Song name={track.name}
+                            artistName={track.artists[0].name}
+                            albumArtUrl={track.album.images[0].url}/>
+                    </ListItem>
+                )
+            })
+        }
+
         return (
             <div className={classes.linkedContent}>
                 <TextField label="Search spotify"
@@ -46,6 +63,9 @@ class SpotifyBrowser extends Component<WithStyles<typeof styles> & IProps> {
                     onChange={event => controller.onSearch(event.target.value)}
                     type="search" 
                     className={classes.spotifySearch}/>
+                <List>
+                    {results}
+                </List>
             </div>
         )
     }

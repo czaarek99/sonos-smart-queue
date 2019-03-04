@@ -9,13 +9,18 @@ interface IBrowserData {
     accessTokenExpiration: string
 }
 
+const MIN_SEARCH_LENGTH = 2;
+
 export class SpotifyBrowserController implements ISpotifyBrowserController {
 
     private readonly appController: AppController;
+    private searchTimeout: number;
     @observable private readonly browserStorage = new KeyStore<IBrowserData>(sessionStorage, "browser");
     @observable public searchQuery = "";
     @observable public state = BrowserState.NOT_LINKED;
     @observable public loading = true;
+    @observable public searchResult = null;
+    @observable public searching = false;
 
     constructor(appController: AppController) {
         this.appController = appController;
@@ -72,10 +77,18 @@ export class SpotifyBrowserController implements ISpotifyBrowserController {
     public async onSearch(query: string) : Promise<void> {
         this.searchQuery = query;
 
-        if(query.length > 4) {
-            const token = await this.getAccessToken();
-            const response = await this.spotifyService.search(query, token);
-            console.log(response);
+        clearTimeout(this.searchTimeout);
+        if(!this.searching && query.length > MIN_SEARCH_LENGTH) {
+            this.searchTimeout = window.setTimeout(async () => {
+                this.searching = true;
+                const token = await this.getAccessToken();
+                this.searchResult = await this.spotifyService.search(query, token);
+                this.searching = false;
+
+                if(this.searchQuery !== query) {
+                    this.onSearch(this.searchQuery);
+                }
+            })
         }
     }
 

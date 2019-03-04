@@ -27,7 +27,7 @@ class Queue extends Component<WithStyles<typeof styles> & IProps> {
         const queuedItems = this.props.queued.map((queueItem, index) => {
             return (
                 <ListItem key={index} className={classes.listItem}>
-                    <Song song={queueItem}/>
+                    <Song {...queueItem}/>
                 </ListItem>
             )
         });

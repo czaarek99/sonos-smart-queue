@@ -1,4 +1,4 @@
-import { ISpotifyService, IAccessToken } from "../interfaces/services/SpotifyService";
+import { ISpotifyService, IAccessToken, ISpotifySearchResponse } from "../interfaces/services/SpotifyService";
 import { BaseService } from "./BaseService";
 
 export class SpotifyService extends BaseService implements ISpotifyService {
@@ -13,11 +13,11 @@ export class SpotifyService extends BaseService implements ISpotifyService {
         return await response.text();
     }
 
-    public async search(query: string, token: string) : Promise<any> {
+    public async search(query: string, token: string) : Promise<ISpotifySearchResponse> {
         const params = new URLSearchParams();
         params.append("accessToken", token);
 
         const response = await this.client.get(`/spotify/search/${query}?${params.toString()}`);
-        return response.text();
+        return response.json();
     }
 }

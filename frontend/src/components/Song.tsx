@@ -31,14 +31,16 @@ const styles = createStyles({
 })
 
 interface IProps {
-    song: IQueuedSong
+    name: string,
+    albumArtUrl: string,
+    artistName: string
 }
 
 class Song extends Component<WithStyles<typeof styles> & IProps> {
 
     public render() : ReactNode {
         const classes = this.props.classes;
-        const { albumArtUrl, name, artistName } = this.props.song;
+        const { albumArtUrl, name, artistName } = this.props;
 
         return (
             <div className={classes.container}>
