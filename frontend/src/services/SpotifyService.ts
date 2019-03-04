@@ -1,16 +1,15 @@
 import { ISpotifyService, IAccessToken } from "../interfaces/services/SpotifyService";
-import { FETCH_JSON_HEADERS } from "../constants";
-import { request } from "./Client";
+import { BaseService } from "./BaseService";
 
-export class SpotifyService implements ISpotifyService {
+export class SpotifyService extends BaseService implements ISpotifyService {
 
     public async getAccessToken() : Promise<IAccessToken> {
-        const response = await request("/spotify/token", "GET");
+        const response = await this.client.get("/spotify/token");
         return await response.json();
     }
 
     public async getSpotifyAuthUrl() : Promise<string> {
-        const response = await request("/spotify/authUrl", "GET");
+        const response = await this.client.get("/spotify/authUrl");
         return await response.text();
     }
 
@@ -18,7 +17,7 @@ export class SpotifyService implements ISpotifyService {
         const params = new URLSearchParams();
         params.append("accessToken", token);
 
-        const response = await request(`/spotify/search/${query}?${params.toString()}`, "GET");
+        const response = await this.client.get(`/spotify/search/${query}?${params.toString()}`);
         return response.text();
     }
 }

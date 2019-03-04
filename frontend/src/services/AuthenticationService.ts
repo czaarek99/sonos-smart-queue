@@ -1,30 +1,30 @@
-import { IAuthenticationService } from "../interfaces/services/AuthenticationService";
-import { FETCH_JSON_HEADERS } from "../constants";
-import { request } from "./Client";
+import { IAuthenticationService, AccessToken } from "../interfaces/services/AuthenticationService";
+import { BaseService } from "./BaseService";
 
 enum LoginStatus {
     LOGGED_IN = "loggedIn",
     LOGGED_OUT = "loggedOut"
 }
 
-export class AuthenticationService implements IAuthenticationService {
+export class AuthenticationService extends BaseService implements IAuthenticationService {
     
-    public async logIn(username: string, password: string) : Promise<void> {
-        await request("/account/login", "POST", {
+    public async logIn(username: string, password: string) : Promise<AccessToken> {
+        const response = await this.client.post("/account/login", {
             username, password
         });
+
+        return await response.text();
     }
 
-    public async register(username: string, password: string) : Promise<void> {
-        await request("/account", "PUT", {
+    public async register(username: string, password: string) : Promise<AccessToken> {
+        const response = await this.client.put("/account", {
             username, password
-        })
+        });
+
+        return await response.text();
     }
 
-    public async isLoggedIn() : Promise<boolean> {
-        const response = await request("/account/loginStatus", "GET");
-        const text = await response.text()
-        return text === LoginStatus.LOGGED_IN;
+    public async verifyToken() : Promise<void> {
+        await this.client.get("/account/tokenStatus");
     }
-
 }

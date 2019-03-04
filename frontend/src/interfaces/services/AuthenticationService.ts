@@ -1,7 +1,9 @@
-type AuthFunction = (username: string, password: string) => Promise<void>
+export type AccessToken = string
+
+type AuthFunction = (username: string, password: string) => Promise<AccessToken>
 
 export interface IAuthenticationService {
     logIn: AuthFunction
     register: AuthFunction
-    isLoggedIn: () => Promise<boolean>
+    verifyToken: () => Promise<void>
 }

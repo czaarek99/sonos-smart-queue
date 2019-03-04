@@ -1,8 +1,8 @@
 import { ISpotifyBrowserController, BrowserState } from "../interfaces/controllers/SpotifyBrowserController";
 import { observable } from "mobx";
-import { IRootStore } from "../interfaces/stores/RootStore";
-import { IAccessToken } from "../interfaces/services/SpotifyService";
+import { IAccessToken, ISpotifyService } from "../interfaces/services/SpotifyService";
 import { KeyStore } from "../storage/KeyStore";
+import { AppController } from "./AppController";
 
 interface IBrowserData {
     accessToken: string,
@@ -11,21 +11,25 @@ interface IBrowserData {
 
 export class SpotifyBrowserController implements ISpotifyBrowserController {
 
+    private readonly appController: AppController;
     @observable private readonly browserStorage = new KeyStore<IBrowserData>(sessionStorage, "browser");
-    @observable private readonly rootStore: IRootStore;
     @observable public searchQuery = "";
     @observable public state = BrowserState.NOT_LINKED;
     @observable public loading = true;
 
-    constructor(rootStore: IRootStore) {
-        this.rootStore = rootStore;
+    constructor(appController: AppController) {
+        this.appController = appController;
         this.load();
+    }
+
+    private get spotifyService() : ISpotifyService {
+        return this.appController.getServices().spotifyService;
     }
 
     private async getAccessToken() : Promise<string> {
 
         const requestToken = async () => {
-            const response = await this.rootStore.services.spotifyService.getAccessToken();
+            const response = await this.spotifyService.getAccessToken();
             const expirationDate = new Date();
             expirationDate.setSeconds(expirationDate.getSeconds() +  response.expiresIn);
 
@@ -70,13 +74,13 @@ export class SpotifyBrowserController implements ISpotifyBrowserController {
 
         if(query.length > 4) {
             const token = await this.getAccessToken();
-            const response = await this.rootStore.services.spotifyService.search(query, token);
+            const response = await this.spotifyService.search(query, token);
             console.log(response);
         }
     }
 
     public async onLink() : Promise<void> {
-        const url = await this.rootStore.services.spotifyService.getSpotifyAuthUrl();
+        const url = await this.spotifyService.getSpotifyAuthUrl();
         this.state = BrowserState.LINKING;
         window.location.replace(url)
     }

@@ -28,12 +28,19 @@ function defineModel(name, columns) {
         unique: true,
     };
 
-    return sequelize.define(name, columns, {
+    dbExports[name] = sequelize.define(name, columns, {
         timestamps: false
     });
 }
 
-dbExports.User = defineModel("User", {
+function addDefaultUserAssociation(model) {
+    model.belongsTo(dbExports.User, {
+        foreignKey: "userId",
+        targetKey: "id"
+    });
+}
+
+defineModel("User", {
     username: {
         type: DataTypes.STRING,
         unique: true
@@ -46,14 +53,7 @@ dbExports.User = defineModel("User", {
     }
 });
 
-function addDefaultUserAssociation(model) {
-    model.belongsTo(dbExports.User, {
-        foreignKey: "userId",
-        targetKey: "id"
-    });
-}
-
-dbExports.QueuedSong = defineModel("QueuedSong", {
+defineModel("QueuedSong", {
     groupId: {
 		type: DataTypes.STRING
     },
@@ -86,7 +86,7 @@ dbExports.QueuedSong = defineModel("QueuedSong", {
 
 addDefaultUserAssociation(dbExports.QueuedSong);
 
-dbExports.RefreshToken = defineModel("RefreshToken", {
+defineModel("SpotifyRefreshToken", {
     token: {
         type: DataTypes.STRING
     },
@@ -96,15 +96,23 @@ dbExports.RefreshToken = defineModel("RefreshToken", {
     }
 });
 
-addDefaultUserAssociation(dbExports.RefreshToken);
+addDefaultUserAssociation(dbExports.SpotifyRefreshToken);
 
-const Log = defineModel("Log", {
+defineModel("AccessToken", {
+    token: {
+        type: DataTypes.STRING
+    },
+    creationDate: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW
+    }
+})
+
+addDefaultUserAssociation(dbExports.AccessToken);
+
+defineModel("Log", {
     action: {
         type: DataTypes.STRING(70)
-    },
-    userId: {
-        type: DataTypes.INTEGER,
-        allowNull: true
     },
     ip: {
         type: DataTypes.STRING(50),
@@ -120,7 +128,7 @@ const Log = defineModel("Log", {
     }
 });
 
-addDefaultUserAssociation(Log);
+addDefaultUserAssociation(dbExports.Log);
 
 dbExports.logAction = (req, action, data) => {
     let query = {
@@ -136,7 +144,7 @@ dbExports.logAction = (req, action, data) => {
     }
     
     
-    return Log.create(query);
+    return dbExports.Log.create(query);
 };
 
 module.exports = dbExports;

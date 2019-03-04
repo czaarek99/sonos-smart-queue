@@ -4,6 +4,7 @@ const database = require("../database");
 const APIError = require("../util/APIError");
 const { throwIfNotStringOrEmpty } = require("../util/validation");
 const { spotifyQueueSecret, spotifyRedirectUri,isProduction } = require("../config");
+const authentication = require("../middlewares/authentication");
 
 const scopes = ["playlist-read-private", "playlist-read-collaborative", "user-read-email"];
 
@@ -15,19 +16,6 @@ function getBaseClient(options = {}) {
         ...options
     });
 }
-
-router.get("/authUrl", async(req, res) => {
-    const client = getBaseClient();
-
-    const user = await database.User.findOne({
-        where: {
-            id: req.session.userId
-        }
-    });
-
-    const authUrl = client.createAuthorizeURL(scopes, user.uuid);
-    res.status(200).send(authUrl);
-});
 
 router.get("/redirect", async(req, res) => {
     const { code, state, error } = req.query;
@@ -51,7 +39,7 @@ router.get("/redirect", async(req, res) => {
         const client = getBaseClient();
         const data = await client.authorizationCodeGrant(code);
 
-        await database.RefreshToken.create({
+        await database.SpotifyRefreshToken.create({
             token: data.body.refresh_token,
             userId: user.id
         });
@@ -65,8 +53,23 @@ router.get("/redirect", async(req, res) => {
 
 });
 
+router.use(authentication);
+
+router.get("/authUrl", async(req, res) => {
+    const client = getBaseClient();
+
+    const user = await database.User.findOne({
+        where: {
+            id: req.session.userId
+        }
+    });
+
+    const authUrl = client.createAuthorizeURL(scopes, user.uuid);
+    res.status(200).send(authUrl);
+});
+
 router.use(async (req, res, next) => {
-    const refreshToken = await database.RefreshToken.findOne({
+    const refreshToken = await database.SpotifyRefreshToken.findOne({
         where: {
             userId: req.session.userId
         }

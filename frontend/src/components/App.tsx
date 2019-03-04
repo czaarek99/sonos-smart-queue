@@ -7,12 +7,9 @@ import "typeface-roboto";
 import { LoginController } from '../controllers/LoginController';
 import { AuthenticationService } from '../services/AuthenticationService';
 import { Provider, inject, observer } from 'mobx-react';
-import { RootStore } from '../stores/RootStore';
 import SmartQueue from './pages/SmartQueue';
 import { SmartQueueController } from '../controllers/SmartQueueController';
 import { SpotifyBrowserController } from '../controllers/SpotifyBrowserController';
-import { IAppController } from '../interfaces/controllers/AppController';
-import { IRootStore } from '../interfaces/stores/RootStore';
 import { AppController } from '../controllers/AppController';
 import { observable } from 'mobx';
 
@@ -41,14 +38,11 @@ interface IProps {}
 @observer
 class App extends Component<IProps & WithStyles<typeof styles>> {
 
-    @observable private readonly controller: IAppController;
-    private readonly rootStore: IRootStore;
+    @observable private readonly controller: AppController;
 
     constructor(props) {
         super(props);
-
-        this.rootStore = new RootStore();
-        this.controller = new AppController(this.rootStore);
+        this.controller = new AppController();
     }
 
 	render() : ReactNode {
@@ -56,20 +50,18 @@ class App extends Component<IProps & WithStyles<typeof styles>> {
 
 		if(this.controller.loggedIn) {
             content = (
-                <SmartQueue controller={new SmartQueueController(this.rootStore)} 
-                    browserController={new SpotifyBrowserController(this.rootStore)}/>
+                <SmartQueue controller={new SmartQueueController(this.controller)} 
+                    browserController={new SpotifyBrowserController(this.controller)}/>
             )
 		} else {
-			content = <Login controller={new LoginController(this.rootStore, this.controller)}/>;
+			content = <Login controller={new LoginController(this.controller)}/>;
 		}
 
 		return (
-			<Provider rootStore={this.rootStore}>
-				<MuiThemeProvider theme={theme}>
-					<CssBaseline />
-                    {content}
-				</MuiThemeProvider>
-			</Provider>
+            <MuiThemeProvider theme={theme}>
+                <CssBaseline />
+                {content}
+            </MuiThemeProvider>
 		)
 	}
 }

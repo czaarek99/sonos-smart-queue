@@ -3,15 +3,17 @@ const database = require("../database");
 const APIError = require("../util/APIError");
 const bcrypt = require("bcrypt");
 const uuid4 = require("uuid/v4");
+const authentication = require("../middlewares/authentication");
 
 const { throwIfNotValidPassword, throwIfNotValidUsername, throwIfNotStringOrEmpty } = require("../util/validation");
 
-function setLoggedIn(req, res, username, userId) {
-    req.session.loggedIn = true;
-    req.session.userId = userId;
-    res.cookie("loggedIn", true);
-    res.cookie("username", username);
-    res.status(200).send();
+async function respondToAuth(res, userId) {
+    const accessToken = await database.AccessToken.create({
+        token: uuid4(),
+        userId
+    });
+
+    res.status(200).send(accessToken.token);
 }
 
 router.put("/", async(req, res) => {
@@ -36,9 +38,9 @@ router.put("/", async(req, res) => {
 		username,
         password: hashedPassword,
         uuid: uuid4() 
-	});
+    });
 
-	setLoggedIn(req, res, username, newUser.id);
+    respondToAuth(res, newUser.id);
 });
 
 router.post("/login", async(req, res) => {
@@ -63,18 +65,15 @@ router.post("/login", async(req, res) => {
 
 	const passwordMatchesHash = await bcrypt.compare(password, user.password);
 	if(passwordMatchesHash) {
-		setLoggedIn(req, res, username, user.id)
+		respondToAuth(res, user.id)
 	} else {
 		throwBadDetails();
 	}
 });
 
-router.get("/loginStatus", async (req, res) => {
-    if(req.session && req.session.loggedIn) {
-        res.status(200).send("loggedIn")
-    } else {
-        res.status(200).send("loggedOut")
-    }
+router.get("/tokenStatus", authentication);
+router.get("/tokenStatus", async (req, res) => {
+    res.status(200);
 });
 
 module.exports = router;

@@ -1,10 +1,10 @@
 import { IInfoService, ISpeakerGroup } from "../interfaces/services/InfoService";
-import { request } from "./Client";
+import { BaseService } from "./BaseService";
 
-export class InfoService implements IInfoService {
+export class InfoService extends BaseService implements IInfoService {
 
     public async getGroups() : Promise<ISpeakerGroup[]> {
-        const response = await request("/info/groups", "GET");
+        const response = await this.client.get("/info/groups");
         return await response.json();
     }
 

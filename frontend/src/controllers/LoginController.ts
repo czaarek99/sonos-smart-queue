@@ -3,20 +3,16 @@ import { observable } from "mobx";
 import { LoginModel } from "../models/LoginModel";
 import { ILoginModel } from "../interfaces/models/LoginModel";
 import { IAuthenticationService } from "../interfaces/services/AuthenticationService";
-import { IRootStore } from "../interfaces/stores/RootStore";
-import { HttpError } from "../services/Client";
-import { IAppController } from "../interfaces/controllers/AppController";
+import { AppController } from "./AppController";
 
 export class LoginController implements ILoginController {
 
-    private readonly authenticationService: IAuthenticationService;
-    private readonly appController: IAppController;
+    private readonly appController: AppController;
     @observable public error = "";
     @observable public model = new LoginModel();
     @observable public loading = false;
 
-    constructor(rootStore: IRootStore, appController: IAppController) {
-        this.authenticationService = rootStore.services.authenticationService;
+    constructor(appController: AppController) {
         this.appController = appController;
     }
 
@@ -24,16 +20,13 @@ export class LoginController implements ILoginController {
         this.model[key] = value;
     }
 
-    private setLoggedIn() {
-        this.appController.login();
-    }
-
     public async onLogin() {
         this.loading = true;
 
         try {
-            await this.authenticationService.logIn(this.model.username, this.model.password);
-            this.setLoggedIn();
+            const token = await this.appController.getServices()
+                .authenticationService.logIn(this.model.username, this.model.password);
+            this.appController.setAccessToken(token)
         } catch(error) {
             this.error = error.body.message;
         }
@@ -45,9 +38,11 @@ export class LoginController implements ILoginController {
         this.loading = true;
 
         try {
-            await this.authenticationService.register(this.model.username, this.model.password);
-            this.setLoggedIn();
+            const token = await this.appController.getServices()
+                .authenticationService.register(this.model.username, this.model.password);
+            this.appController.setAccessToken(token);
         } catch(error) {
+            console.error(error);
             this.error = error.body.message;
         }
 

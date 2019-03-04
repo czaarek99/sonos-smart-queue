@@ -1,11 +1,10 @@
 import { IQueueService, IQueuedSong } from "../interfaces/services/QueueService";
-import { FETCH_JSON_HEADERS } from "../constants";
-import { request } from "./Client";
+import { BaseService } from "./BaseService";
 
-export class QueueService implements IQueueService {
+export class QueueService extends BaseService implements IQueueService {
 
     public async getQueue(groupId: string) : Promise<IQueuedSong[]> {
-        const response = await request("/queue/list/" + groupId, "GET");
+        const response = await this.client.get("/queue/list/" + groupId);
         return await response.json();
     }
 
