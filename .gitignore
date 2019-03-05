@@ -7,5 +7,6 @@ package-lock.json
 .idea
 
 ngrok*
+start.sh
 
 *.vim

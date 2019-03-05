@@ -4,7 +4,7 @@ import { ISpotifyBrowserController, BrowserState } from "../../interfaces/contro
 import Section from "../Section";
 import { observer } from "mobx-react";
 import SearchIcon from "@material-ui/icons/Search";
-import Song from "../Song";
+import PlaybackItem from "./PlaybackItem";
 
 const styles = createStyles({
     content: {
@@ -30,6 +30,9 @@ const styles = createStyles({
     },
     resultListItem: {
         padding: 0
+    },
+    resultList: {
+        overflow: "scroll"
     }
 });
 
@@ -48,8 +51,8 @@ class SpotifyBrowser extends Component<WithStyles<typeof styles> & IProps> {
             results = controller.searchResult.tracks.items.map((track) => {
                 return (
                     <ListItem className={classes.resultListItem} key={track.id}>
-                        <Song name={track.name}
-                            artistName={track.artists[0].name}
+                        <PlaybackItem title={track.name}
+                            subtitle={track.artists[0].name}
                             albumArtUrl={track.album.images[0].url}/>
                     </ListItem>
                 )
@@ -63,7 +66,7 @@ class SpotifyBrowser extends Component<WithStyles<typeof styles> & IProps> {
                     onChange={event => controller.onSearch(event.target.value)}
                     type="search" 
                     className={classes.spotifySearch}/>
-                <List>
+                <List className={classes.resultList}>
                     {results}
                 </List>
             </div>

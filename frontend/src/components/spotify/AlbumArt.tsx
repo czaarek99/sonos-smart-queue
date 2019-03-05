@@ -12,7 +12,7 @@ const styles = createStyles({
     }
 });
 
-class Album extends Component<WithStyles<typeof styles> & IProps> {
+class AlbumArt extends Component<WithStyles<typeof styles> & IProps> {
 
     public render() : ReactNode {
         return (
@@ -21,4 +21,4 @@ class Album extends Component<WithStyles<typeof styles> & IProps> {
     }
 }
 
-export default withStyles(styles)(Album);
+export default withStyles(styles)(AlbumArt);

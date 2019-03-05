@@ -1,7 +1,7 @@
 import { observer } from "mobx-react";
 import React, { Component, ReactNode } from "react";
 import { createStyles, WithStyles, withStyles, Theme } from "@material-ui/core";
-import Song from "../Song";
+import PlaybackItem from "../spotify/PlaybackItem";
 import Navbar from "../Navbar";
 import Queue from "../Queue";
 import { ISmartQueueController } from "../../interfaces/controllers/SmartQueueController";
@@ -22,7 +22,7 @@ const styles = (theme: Theme) => createStyles({
         `,
         height: "100%",
         gridGap: GRID_GAP,
-        paddingBottom: GRID_GAP
+        paddingBottom: GRID_GAP,
     },
     queue: {
         gridArea: "queue",
@@ -35,8 +35,9 @@ const styles = (theme: Theme) => createStyles({
         marginLeft: GRID_GAP
     },
     browse: {
+        maxHeight: "inherit",
         gridArea: "browse",
-        marginRight: GRID_GAP
+        marginRight: GRID_GAP,
     }
 })
 

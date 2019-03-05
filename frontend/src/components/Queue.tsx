@@ -1,7 +1,7 @@
 import React, { Component, ReactNode } from "react";
 import { createStyles, WithStyles, withStyles, ListItem, List, Typography, Paper } from "@material-ui/core";
 import { IQueuedSong } from "../interfaces/services/QueueService";
-import Song from "./Song";
+import PlaybackItem from "./spotify/PlaybackItem";
 import Heading from "./Heading";
 import Section from "./Section";
 
@@ -27,7 +27,9 @@ class Queue extends Component<WithStyles<typeof styles> & IProps> {
         const queuedItems = this.props.queued.map((queueItem, index) => {
             return (
                 <ListItem key={index} className={classes.listItem}>
-                    <Song {...queueItem}/>
+                    <PlaybackItem albumArtUrl={queueItem.albumArtUrl}
+                        title={queueItem.name}
+                        subtitle={queueItem.artistName}/>
                 </ListItem>
             )
         });

@@ -1,7 +1,6 @@
 import React, { Component, ReactNode } from "react";
-import { ListItem, createStyles, WithStyles, withStyles, Typography } from "@material-ui/core";
-import Album from "./Album";
-import { IQueuedSong } from "../interfaces/services/QueueService";
+import { createStyles, WithStyles, withStyles, Typography } from "@material-ui/core";
+import AlbumArt from "./AlbumArt";
 
 const ALBUM_SIZE = 50;
 const HALF_SIZE = ALBUM_SIZE / 2;
@@ -20,7 +19,7 @@ const styles = createStyles({
         gridColumn: "1",
         gridRow: "span 2"
     },
-    songName: {
+    title: {
         gridColumn: "2",
         gridRow: "1",
         fontSize: "17px",
@@ -28,34 +27,34 @@ const styles = createStyles({
         overflow: "hidden",
         whiteSpace: "nowrap"
     },
-    artistName: {
+    subtitle: {
         gridColumn: "2",
         gridRow: "2"
     },
 })
 
 interface IProps {
-    name: string,
+    title: string,
     albumArtUrl: string,
-    artistName: string
+    subtitle: string
 }
 
-class Song extends Component<WithStyles<typeof styles> & IProps> {
+class PlaybackItem extends Component<WithStyles<typeof styles> & IProps> {
 
     public render() : ReactNode {
         const classes = this.props.classes;
-        const { albumArtUrl, name, artistName } = this.props;
+        const { title, subtitle, albumArtUrl } = this.props;
 
         return (
             <div className={classes.container}>
                 <div className={classes.albumContainer}>
-                    <Album imgSrc={albumArtUrl} />
+                    <AlbumArt imgSrc={albumArtUrl} />
                 </div>
-                <Typography className={classes.songName}>
-                    {name}
+                <Typography className={classes.title}>
+                    {title}
                 </Typography>
-                <Typography className={classes.artistName}>
-                    {artistName}
+                <Typography className={classes.subtitle}>
+                    {subtitle}
                 </Typography>
             </div>
         )
@@ -63,4 +62,4 @@ class Song extends Component<WithStyles<typeof styles> & IProps> {
 
 }
 
-export default withStyles(styles)(Song);
+export default withStyles(styles)(PlaybackItem);
