@@ -3,38 +3,68 @@ export interface IAccessToken {
     expiresIn: number
 }
 
-interface ISpotifyArtist {
-    name: string
-    id: string
+interface ISpotifyFollowers {
+    total: number
 }
 
-interface ISpotifyAlbumImage {
+export interface ISpotifyImage {
     size: number,
     url: string
 }
 
-interface ISpotifyAlbum {
-    id: string
-    name: string
-    artists: ISpotifyArtist[]
-    images: ISpotifyAlbumImage[]
+interface ISpotifyTracksInfo {
+    total: number
 }
 
-interface ISpotifyTrack {
+interface ISpotifyBase {
     id: string
     name: string
+}
+
+interface ISpotifyArtist extends ISpotifyBase {
+    images: ISpotifyImage[]
+    followers: ISpotifyFollowers
+}
+
+interface ISpotifyAlbum extends ISpotifyBase {
+    artists: ISpotifyArtist[]
+    images: ISpotifyImage[]
+    release_date: string
+}
+
+interface ISpotifyTrack extends ISpotifyBase {
     album: ISpotifyAlbum
     artists: ISpotifyArtist[]
     duration: number
     explicit: boolean
 }
 
+interface ISpotifyPlaylist extends ISpotifyBase {
+    images: ISpotifyImage[]
+    tracks: ISpotifyTracksInfo
+}
+
 interface ISpotifyTracks {
     items: ISpotifyTrack[]
 }
 
+interface ISpotifyAlbums {
+    items: ISpotifyAlbum[]
+}
+
+interface ISpotifyArtists {
+    items: ISpotifyArtist[]
+}
+
+interface ISpotifyPlaylists {
+    items: ISpotifyPlaylist[]
+}
+
 export interface ISpotifySearchResponse {
     tracks: ISpotifyTracks
+    albums: ISpotifyAlbums
+    artists: ISpotifyArtists
+    playlists: ISpotifyPlaylists
 }
 
 export interface ISpotifyService {

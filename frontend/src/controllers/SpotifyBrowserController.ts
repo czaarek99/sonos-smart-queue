@@ -9,7 +9,15 @@ interface IBrowserData {
     accessTokenExpiration: string
 }
 
+export enum SearchPage {
+    SONGS = 0,
+    PLAYLISTS = 1,
+    ARTISTS = 2,
+    ALBUMS = 3
+}
+
 const MIN_SEARCH_LENGTH = 2;
+const SEARCH_DELAY = 400;
 
 export class SpotifyBrowserController implements ISpotifyBrowserController {
 
@@ -21,6 +29,7 @@ export class SpotifyBrowserController implements ISpotifyBrowserController {
     @observable public loading = true;
     @observable public searchResult = null;
     @observable public searching = false;
+    @observable public selectedNavigation = SearchPage.SONGS;
 
     constructor(appController: AppController) {
         this.appController = appController;
@@ -74,6 +83,10 @@ export class SpotifyBrowserController implements ISpotifyBrowserController {
         this.loading = false;
     }
 
+    public onNavigation(navigation: number) {
+        this.selectedNavigation = navigation;
+    }
+
     public async onSearch(query: string) : Promise<void> {
         this.searchQuery = query;
 
@@ -88,7 +101,7 @@ export class SpotifyBrowserController implements ISpotifyBrowserController {
                 if(this.searchQuery !== query) {
                     this.onSearch(this.searchQuery);
                 }
-            })
+            }, SEARCH_DELAY)
         }
     }
 

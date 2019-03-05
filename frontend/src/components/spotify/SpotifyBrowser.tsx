@@ -1,10 +1,15 @@
 import React, { Component, ReactNode } from "react";
-import { Paper, Typography, Button, createStyles, WithStyles, withStyles, CircularProgress, TextField, List, ListItem } from "@material-ui/core";
+import { Paper, Typography, Button, createStyles, WithStyles, withStyles, CircularProgress, TextField, List, ListItem, BottomNavigation, BottomNavigationAction } from "@material-ui/core";
 import { ISpotifyBrowserController, BrowserState } from "../../interfaces/controllers/SpotifyBrowserController";
 import Section from "../Section";
 import { observer } from "mobx-react";
-import SearchIcon from "@material-ui/icons/Search";
 import PlaybackItem from "./PlaybackItem";
+import MusicNoteIcon from "@material-ui/icons/MusicNote"
+import ViewListIcon from "@material-ui/icons/ViewList"
+import AccountCircleIcon from "@material-ui/icons/AccountCircle"
+import AlbumIcon from "@material-ui/icons/Album"
+import { SearchPage } from "../../controllers/SpotifyBrowserController";
+import { ISpotifyImage } from "../../interfaces/services/SpotifyService";
 
 const styles = createStyles({
     content: {
@@ -12,7 +17,7 @@ const styles = createStyles({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: "10px"
+        padding: "10px 10px 0 10px"
     },
     linkPaper: {
         padding: "5px",
@@ -20,7 +25,9 @@ const styles = createStyles({
     },
     linkedContent: {
         height: "100%",
-        width: "100%"
+        width: "100%",
+        display: "flex",
+        flexDirection: "column"
     },
     spotifySearch: {
         width: "100%"
@@ -32,7 +39,9 @@ const styles = createStyles({
         padding: 0
     },
     resultList: {
-        overflow: "scroll"
+        overflow: "scroll",
+        flex: "1 0",
+        maxHeight: "100%"
     }
 });
 
@@ -40,24 +49,80 @@ interface IProps {
     controller: ISpotifyBrowserController    
 }
 
+
+
 @observer
 class SpotifyBrowser extends Component<WithStyles<typeof styles> & IProps> {
 
     private getLinkedContent() : ReactNode {
         const { classes, controller } = this.props;
 
-        let results = null;
+        const results = [];
         if(controller.searchResult) {
-            results = controller.searchResult.tracks.items.map((track) => {
-                return (
-                    <ListItem className={classes.resultListItem} key={track.id}>
-                        <PlaybackItem title={track.name}
-                            subtitle={track.artists[0].name}
-                            albumArtUrl={track.album.images[0].url}/>
-                    </ListItem>
-                )
-            })
+            const page = controller.selectedNavigation;
+
+            const getArtwork = (images: ISpotifyImage[]) => {
+                if(images.length > 0) {
+                    return images[0].url;
+                } else {
+                    return "/album.png";
+                }
+            }
+
+            if(page === SearchPage.SONGS) {
+                for(const track of controller.searchResult.tracks.items) {
+                    results.push({
+                        id: track.id,
+                        title: track.name,
+                        subtitle: track.artists[0].name,
+                        albumArtUrl: getArtwork(track.album.images)
+                    })
+                }
+            } else if(page === SearchPage.PLAYLISTS) {
+                for(const playlist of controller.searchResult.playlists.items) {
+                    results.push({
+                        id: playlist.id,
+                        title: playlist.name,
+                        subtitle: `${playlist.tracks.total} songs`,
+                        albumArtUrl: getArtwork(playlist.images)
+                    })
+                }
+            } else if(page === SearchPage.ARTISTS) {
+                for(const artist of controller.searchResult.artists.items) {
+                    results.push({
+                        id: artist.id,
+                        title: artist.name,
+                        subtitle: `${artist.followers.total} followers`,
+                        albumArtUrl: getArtwork(artist.images)
+                    })
+                }
+            } else if(page === SearchPage.ALBUMS) {
+                for(const album of controller.searchResult.albums.items) {
+                    results.push({
+                        id: album.id,
+                        title: album.name,
+                        subtitle: album.release_date,
+                        albumArtUrl: getArtwork(album.images)
+                    })
+                }
+            }
         }
+
+        const onNav = (event: React.ChangeEvent<{}>, value: number) => {
+            controller.onNavigation(value);
+        }
+
+        const listItems = results.map((result) => {
+            return (
+                <ListItem className={classes.resultListItem}
+                    key={result.id}
+                    selected={false}
+                    button={true}>
+
+                    <PlaybackItem {...result}/>
+                </ListItem>
+            )
+        })
 
         return (
             <div className={classes.linkedContent}>
@@ -66,9 +131,31 @@ class SpotifyBrowser extends Component<WithStyles<typeof styles> & IProps> {
                     onChange={event => controller.onSearch(event.target.value)}
                     type="search" 
                     className={classes.spotifySearch}/>
+
                 <List className={classes.resultList}>
-                    {results}
+                    {listItems}
                 </List>
+
+                <BottomNavigation showLabels={true} 
+                    onChange={onNav} 
+                    value={controller.selectedNavigation}>
+
+                    <BottomNavigationAction label="Songs"
+                        icon={<MusicNoteIcon />}
+                        value={SearchPage.SONGS}/>
+
+                    <BottomNavigationAction label="Playlists" 
+                        icon={<ViewListIcon />} 
+                        value={SearchPage.PLAYLISTS}/>
+
+                    <BottomNavigationAction label="Artists"
+                        icon={<AccountCircleIcon />}
+                        value={SearchPage.ARTISTS}/>
+
+                    <BottomNavigationAction label="Albums" 
+                        icon={<AlbumIcon />} 
+                        value={SearchPage.ALBUMS}/>
+                </BottomNavigation>
             </div>
         )
     }

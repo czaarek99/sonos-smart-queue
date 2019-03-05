@@ -17,7 +17,10 @@ const styles = createStyles({
     },
     albumContainer: {
         gridColumn: "1",
-        gridRow: "span 2"
+        gridRow: "span 2",
+        overflow: "hidden",
+        maxHeight: `${ALBUM_SIZE}px`,
+        maxWidth: `${ALBUM_SIZE}px`
     },
     title: {
         gridColumn: "2",
