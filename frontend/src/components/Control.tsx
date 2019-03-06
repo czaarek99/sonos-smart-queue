@@ -23,7 +23,8 @@ const styles = createStyles({
         display: "block",
     },
     controlsContainer: {
-        display: "flex"
+        display: "flex",
+        cursor: "pointer"
     },
     volumeContainer: {
         width: "200px",
