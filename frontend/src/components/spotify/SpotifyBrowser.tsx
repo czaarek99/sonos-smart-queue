@@ -116,6 +116,7 @@ class SpotifyBrowser extends Component<WithStyles<typeof styles> & IProps> {
                 <ListItem className={classes.resultListItem}
                     key={result.id}
                     selected={false}
+                    onClick={() => {}}
                     button={true}>
 
                     <PlaybackItem {...result}/>

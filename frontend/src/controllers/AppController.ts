@@ -8,6 +8,7 @@ import { AuthenticationService } from "../services/AuthenticationService";
 import { QueueService } from "../services/QueueService";
 import { InfoService } from "../services/InfoService";
 import { SpotifyService } from "../services/SpotifyService";
+import { SmartQueueController } from "./SmartQueueController";
 
 interface IGlobalData {
     accessToken: string

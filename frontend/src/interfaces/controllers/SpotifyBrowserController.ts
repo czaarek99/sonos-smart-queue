@@ -13,6 +13,7 @@ export interface ISpotifyBrowserController {
     readonly searchQuery: string
     readonly searchResult: ISpotifySearchResponse;
     readonly selectedNavigation: number
+
     onNavigation: (navigation: number) => void
     onLink: () => Promise<void>
     onSearch: (query: string) => Promise<void>
