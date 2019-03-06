@@ -12,6 +12,7 @@ import { SmartQueueController } from '../controllers/SmartQueueController';
 import { SpotifyBrowserController } from '../controllers/SpotifyBrowserController';
 import { AppController } from '../controllers/AppController';
 import { observable } from 'mobx';
+import { ControlController } from '../controllers/ControlController';
 
 const styles = createStyles({
 	"@global": {
@@ -51,6 +52,7 @@ class App extends Component<IProps & WithStyles<typeof styles>> {
 		if(this.controller.loggedIn) {
             content = (
                 <SmartQueue controller={new SmartQueueController(this.controller)} 
+                    controlController={new ControlController()}
                     browserController={new SpotifyBrowserController(this.controller)}/>
             )
 		} else {

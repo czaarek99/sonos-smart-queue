@@ -8,63 +8,72 @@ import { ISmartQueueController } from "../../interfaces/controllers/SmartQueueCo
 import GroupChooser from "../GroupChooser";
 import SpotifyBrowser from "../spotify/SpotifyBrowser";
 import { ISpotifyBrowserController } from "../../interfaces/controllers/SpotifyBrowserController";
+import Control from "../Control";
+import { IControlController } from "../../interfaces/controllers/ControlController";
 
 const GRID_GAP = "10px";
 
 const styles = (theme: Theme) => createStyles({
     container: {
+        height: "100%",
+        display: "flex",
+        flexDirection: "column"
+    },
+    grid: {
         display: "grid",
         gridTemplateColumns: "min-content min-content auto",
         gridTemplateRows: "min-content auto",
         gridTemplateAreas: `
-            "nav nav nav"
+            "control control control"
             "groups queue browse"
         `,
-        height: "100%",
         gridGap: GRID_GAP,
-        paddingBottom: GRID_GAP,
+        padding: GRID_GAP,
+        flexGrow: 1
     },
     queue: {
         gridArea: "queue",
     },
-    nav: {
-        gridArea: "nav",
+    control: {
+        gridArea: "control",
     },
     groups: {
         gridArea: "groups",
-        marginLeft: GRID_GAP
     },
     browse: {
         maxHeight: "inherit",
         gridArea: "browse",
-        marginRight: GRID_GAP,
     }
 })
 
 interface IProps {
     controller: ISmartQueueController,
     browserController: ISpotifyBrowserController
+    controlController: IControlController
 }
 
 @observer
 class SmartQueue extends Component<WithStyles<typeof styles> & IProps> {
 
-    render() : ReactNode {
+    public render() : ReactNode {
         const { classes, controller } = this.props;
 
         return (
             <div className={classes.container}>
-                <div className={classes.nav}>
-                    <Navbar />
-                </div>
-                <div className={classes.queue}>
-                    <Queue queued={controller.queueItems}/>
-                </div>
-                <div className={classes.groups}>
-                    <GroupChooser groups={controller.speakerGroups} onSelect={() => {}}/>
-                </div>
-                <div className={classes.browse}>
-                    <SpotifyBrowser controller={this.props.browserController}/>
+                <Navbar />
+                <div className={classes.grid}>
+                    <div className={classes.control}>
+                        <Control controller={this.props.controlController}/>
+                    </div>
+                    <div className={classes.queue}>
+                        <Queue queued={controller.queueItems}/>
+                    </div>
+                    <div className={classes.groups}>
+                        <GroupChooser groups={controller.speakerGroups} onSelect={() => {}}/>
+                    </div>
+                    <div className={classes.browse}>
+                        <SpotifyBrowser controller={this.props.browserController}/>
+                    </div>
                 </div>
             </div>
         )

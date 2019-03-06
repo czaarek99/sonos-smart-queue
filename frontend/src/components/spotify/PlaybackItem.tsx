@@ -13,7 +13,8 @@ const styles = createStyles({
         gridTemplateColumns: `${ALBUM_SIZE}px auto`,
         alignItems: "center",
         columnGap: "10px",
-        margin: "5px"
+        margin: "5px",
+        minWidth: "200px"
     },
     albumContainer: {
         gridColumn: "1",

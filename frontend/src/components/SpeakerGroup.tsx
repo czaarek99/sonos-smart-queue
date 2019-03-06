@@ -1,14 +1,12 @@
 import React, { Component, ReactNode } from "react";
-import { Divider, Typography, createStyles, FormHelperText, WithStyles, withStyles, Theme } from "@material-ui/core";
+import { Divider, Typography, createStyles, FormHelperText, WithStyles, withStyles, Theme, Paper } from "@material-ui/core";
 import SpeakerGroupIcon from '@material-ui/icons/SpeakerGroup';
 import SpeakerIcon from '@material-ui/icons/Speaker';
 
 const styles = (theme: Theme) => createStyles({
     container: {
         minWidth: "200px",
-        border: `2px solid ${theme.palette.primary.main}`,
-        borderRadius: "2px",
-        margin: "10px"
+        margin: "13px"
     },
     speaker: {
         display: "flex",
@@ -40,7 +38,7 @@ class SpeakerGroup extends Component<WithStyles<typeof styles> & IProps> {
         })
 
         return (
-            <div className={classes.container}>
+            <Paper className={classes.container}>
                 <div className={classes.group}>
                     <SpeakerGroupIcon />
                     <Typography variant="subtitle1">
@@ -49,7 +47,7 @@ class SpeakerGroup extends Component<WithStyles<typeof styles> & IProps> {
                 </div>
                 <Divider />
                 {speakers}
-            </div>
+            </Paper>
         )
     }
 }

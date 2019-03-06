@@ -41,15 +41,14 @@ const styles = createStyles({
     resultList: {
         overflow: "scroll",
         flex: "1 0",
-        maxHeight: "100%"
+        maxHeight: "100%",
+        marginTop: "5px"
     }
 });
 
 interface IProps {
     controller: ISpotifyBrowserController    
 }
-
-
 
 @observer
 class SpotifyBrowser extends Component<WithStyles<typeof styles> & IProps> {
@@ -127,6 +126,7 @@ class SpotifyBrowser extends Component<WithStyles<typeof styles> & IProps> {
         return (
             <div className={classes.linkedContent}>
                 <TextField label="Search spotify"
+                    variant="outlined"
                     value={controller.searchQuery}
                     onChange={event => controller.onSearch(event.target.value)}
                     type="search" 
