@@ -73,7 +73,7 @@ router.post("/login", async(req, res) => {
 
 router.get("/tokenStatus", authentication);
 router.get("/tokenStatus", async (req, res) => {
-    res.status(200);
+    res.status(200).send();
 });
 
 module.exports = router;
