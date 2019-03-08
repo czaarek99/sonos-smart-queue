@@ -16,8 +16,6 @@ const styles = createStyles({
     content: {
         height: "100%",
         display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
         padding: "10px 10px 0 10px"
     },
     linkPaper: {
