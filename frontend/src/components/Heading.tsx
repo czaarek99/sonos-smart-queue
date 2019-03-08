@@ -4,7 +4,8 @@ import { WithStyles, createStyles, withStyles, Typography } from "@material-ui/c
 const styles = createStyles({
     heading: {
         textAlign: "center",
-        paddingBottom: "10px"
+        paddingBottom: "10px",
+        paddingTop: "10px"
     }
 });
 
