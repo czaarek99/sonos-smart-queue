@@ -1,21 +1,13 @@
 const router = require("express-promise-router")();
-const SpotifyWebApi = require("spotify-web-api-node");
 const database = require("../database");
 const APIError = require("../util/APIError");
 const { throwIfNotStringOrEmpty } = require("../util/validation");
-const { spotifyQueueSecret, spotifyRedirectUri,isProduction } = require("../config");
+const { isProduction } = require("../config");
+const { getBaseClient } = require("../spotify/client");
 const authentication = require("../middlewares/authentication");
+const { accessTokenMiddleware, refreshTokenMiddleware } = require("../middlewares/token");
 
 const scopes = ["playlist-read-private", "playlist-read-collaborative", "user-read-email"];
-
-function getBaseClient(options = {}) {
-    return new SpotifyWebApi({
-        redirectUri: `${spotifyRedirectUri}/spotify/redirect`,
-        clientId: "66587271d5af4788852dbfe82a7d6364",
-        clientSecret: spotifyQueueSecret,
-        ...options
-    });
-}
 
 router.get("/redirect", async(req, res) => {
     const { code, state, error } = req.query;
@@ -68,24 +60,10 @@ router.get("/authUrl", async(req, res) => {
     res.status(200).send(authUrl);
 });
 
-router.use(async (req, res, next) => {
-    const refreshToken = await database.SpotifyRefreshToken.findOne({
-        where: {
-            userId: req.session.userId
-        }
-    });
-
-    if(refreshToken === null) {
-        throw new APIError(404, "No refresh token found");
-    }
-
-    res.locals.refreshToken = refreshToken.token
-    await next();
-});
-
+router.use(refreshTokenMiddleware);
 router.get("/token", async (req, res) => {
     const client = getBaseClient({
-        refreshToken: res.locals.refreshToken
+        refreshToken: res.locals.spotifyRefreshToken
     });
 
     try {
@@ -99,15 +77,14 @@ router.get("/token", async (req, res) => {
     }
 });
 
+router.use(accessTokenMiddleware);
 router.get("/search/:query", async(req, res) => {
-    const accessToken = req.query.accessToken;
-    throwIfNotStringOrEmpty("accessToken", accessToken);
     const query = req.params.query;
     throwIfNotStringOrEmpty("query", query);
 
     const client = getBaseClient({
-        refreshToken: res.locals.refreshToken,
-        accessToken
+        refreshToken: res.locals.spotifyRefreshToken,
+        accessToken: res.locals.spotifyAccessToken
     });
 
     const response = await client.search(query, ["album", "artist", "track", "playlist"], {
@@ -115,7 +92,6 @@ router.get("/search/:query", async(req, res) => {
     });
 
     res.status(200).send(response.body);
-
 });
 
 module.exports = router;

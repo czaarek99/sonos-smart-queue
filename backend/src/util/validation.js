@@ -59,5 +59,6 @@ module.exports = {
 	throwIfNotStringOrEmpty,
 	throwIfNotSpotifyUri,
 	throwIfNotValidPassword,
-	throwIfNotValidUsername
+	throwIfNotValidUsername,
+	throwIfNotSonosGroupId
 };

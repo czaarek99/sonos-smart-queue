@@ -14,10 +14,10 @@ export class SpotifyService extends BaseService implements ISpotifyService {
     }
 
     public async search(query: string, token: string) : Promise<ISpotifySearchResponse> {
-        const params = new URLSearchParams();
-        params.append("accessToken", token);
+        const response = await this.client.get(`/spotify/search/${query}`, {
+            SpotifyToken: token
+        });
 
-        const response = await this.client.get(`/spotify/search/${query}?${params.toString()}`);
         return response.json();
     }
 }

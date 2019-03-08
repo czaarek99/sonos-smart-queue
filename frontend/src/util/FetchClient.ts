@@ -27,10 +27,19 @@ export class FetchClient {
         this.headers = headers;
     }
 
-    private async request(url: string, method: RequestMethod, body?: object) : Promise<Response> {
+    private async request(url: string, method: RequestMethod, body?: object, headers?: HeadersInit) : Promise<Response> {
+        let extraHeaders = {};
+
+        if(headers) {
+            extraHeaders = headers;
+        }
+
         const config : RequestInit = {
             method,
-            headers: this.headers
+            headers: {
+                ...this.headers,
+                ...extraHeaders
+            }
         };
 
         if(body) {
@@ -47,20 +56,20 @@ export class FetchClient {
         return response;
     }
 
-    public async get(url: string) : Promise<Response> {
-        return await this.request(url, "GET");
+    public async get(url: string, headers?: HeadersInit) : Promise<Response> {
+        return await this.request(url, "GET", undefined, headers);
     }
 
-    public async post(url: string, body: object) : Promise<Response> {
-        return await this.request(url, "POST", body)
+    public async post(url: string, body: object, headers?: HeadersInit) : Promise<Response> {
+        return await this.request(url, "POST", body, headers)
     }
 
-    public async put(url: string, body: object) : Promise<Response> {
-        return await this.request(url, "PUT", body)
+    public async put(url: string, body: object, headers?: HeadersInit) : Promise<Response> {
+        return await this.request(url, "PUT", body, headers);
     }
 
-    public async patch(url: string, body: object) : Promise<Response> {
-        return await this.request(url, "PATCH", body)
+    public async patch(url: string, body: object, headers?: HeadersInit) : Promise<Response> {
+        return await this.request(url, "PATCH", body, headers)
     }
 
 }

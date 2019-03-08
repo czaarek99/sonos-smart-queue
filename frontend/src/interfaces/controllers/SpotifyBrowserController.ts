@@ -1,4 +1,5 @@
 import { ISpotifySearchResponse } from "../services/SpotifyService";
+import { QueueItemType } from "../services/QueueService";
 
 export enum BrowserState {
     NOT_LINKED,
@@ -14,6 +15,7 @@ export interface ISpotifyBrowserController {
     readonly searchResult: ISpotifySearchResponse;
     readonly selectedNavigation: number
 
+    onQueue: (id: string, type: QueueItemType) => Promise<void>
     onNavigation: (navigation: number) => void
     onLink: () => Promise<void>
     onSearch: (query: string) => Promise<void>

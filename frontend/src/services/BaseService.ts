@@ -5,9 +5,10 @@ export class BaseService {
 
     protected readonly client: FetchClient;
 
-    constructor(accessToken: string) {
+    constructor(accessToken: string, headers?: object) {
         this.client = new FetchClient({
             Authorization: accessToken,
+            ...headers,
             ...FETCH_JSON_HEADERS
         })
     }

@@ -3,6 +3,7 @@ import { observable } from "mobx";
 import { IAccessToken, ISpotifyService } from "../interfaces/services/SpotifyService";
 import { KeyStore } from "../storage/KeyStore";
 import { AppController } from "./AppController";
+import { QueueItemType } from "../interfaces/services/QueueService";
 
 interface IBrowserData {
     accessToken: string,
@@ -85,6 +86,13 @@ export class SpotifyBrowserController implements ISpotifyBrowserController {
 
     public onNavigation(navigation: number) {
         this.selectedNavigation = navigation;
+    }
+
+    public async onQueue(id: string, type: QueueItemType) {
+        const token = await this.getAccessToken();
+        //TODO: Make groupids work properly
+        await this.appController.getServices()
+            .queueService.addToQueue(token, "test", id, type);
     }
 
     public async onSearch(query: string) : Promise<void> {

@@ -10,6 +10,7 @@ import AccountCircleIcon from "@material-ui/icons/AccountCircle"
 import AlbumIcon from "@material-ui/icons/Album"
 import { SearchPage } from "../../controllers/SpotifyBrowserController";
 import { ISpotifyImage } from "../../interfaces/services/SpotifyService";
+import { QueueItemType } from "../../interfaces/services/QueueService";
 
 const styles = createStyles({
     content: {
@@ -50,13 +51,21 @@ interface IProps {
     controller: ISpotifyBrowserController    
 }
 
+interface IResultItem {
+    id: string,
+    title: string
+    subtitle: string
+    albumArtUrl: string
+    onClick?: () => void
+}
+
 @observer
 class SpotifyBrowser extends Component<WithStyles<typeof styles> & IProps> {
 
     private getLinkedContent() : ReactNode {
         const { classes, controller } = this.props;
 
-        const results = [];
+        const results : IResultItem[] = [];
         if(controller.searchResult) {
             const page = controller.selectedNavigation;
 
@@ -74,7 +83,10 @@ class SpotifyBrowser extends Component<WithStyles<typeof styles> & IProps> {
                         id: track.id,
                         title: track.name,
                         subtitle: track.artists[0].name,
-                        albumArtUrl: getArtwork(track.album.images)
+                        albumArtUrl: getArtwork(track.album.images),
+                        onClick: () => {
+                            controller.onQueue(track.id, QueueItemType.SONG)
+                        }
                     })
                 }
             } else if(page === SearchPage.PLAYLISTS) {
@@ -113,10 +125,10 @@ class SpotifyBrowser extends Component<WithStyles<typeof styles> & IProps> {
 
         const listItems = results.map((result) => {
             return (
-                <ListItem className={classes.resultListItem}
+                <ListItem className={classes.resultListItem} 
+                    onClick={result.onClick}
                     key={result.id}
                     selected={false}
-                    onClick={() => {}}
                     button={true}>
 
                     <PlaybackItem {...result}/>
