@@ -7,7 +7,6 @@ import { AppController } from "./AppController";
 export class SmartQueueController implements ISmartQueueController {
 
     private readonly appController: AppController;
-    @observable public speakerGroups: ISpeakerGroup[] = [];
     @observable public loading = true;
 
     constructor(appController: AppController) {
@@ -23,18 +22,8 @@ export class SmartQueueController implements ISmartQueueController {
         return this.appController.getQueue();
     }
 
-    private async refreshGroups() : Promise<void> {
-        this.speakerGroups = await this.appController.getServices()
-            .infoService.getGroups();
-    }
-
     private async load() : Promise<void> {
-        await this.refreshGroups();
         await this.refreshQueue();
-        
-        window.setInterval(async () => {
-            await this.refreshGroups();
-        }, 15 * 1000)
     }
 
     public async refreshQueue() : Promise<void> {

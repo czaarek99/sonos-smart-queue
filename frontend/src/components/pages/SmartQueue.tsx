@@ -10,6 +10,8 @@ import SpotifyBrowser from "../spotify/browser/SpotifyBrowser";
 import { ISpotifyBrowserController } from "../../interfaces/controllers/SpotifyBrowserController";
 import Control from "../Control";
 import { IControlController } from "../../interfaces/controllers/ControlController";
+import { GroupChooserController } from "../../controllers/GroupChooserController";
+import { IGroupChooserController } from "../../interfaces/controllers/GroupChooserController";
 
 const GRID_GAP = "10px";
 
@@ -50,9 +52,10 @@ const styles = (theme: Theme) => createStyles({
 })
 
 interface IProps {
-    controller: ISmartQueueController,
+    controller: ISmartQueueController
     browserController: ISpotifyBrowserController
     controlController: IControlController
+    groupChooserController: IGroupChooserController
 }
 
 @observer
@@ -73,7 +76,7 @@ class SmartQueue extends Component<WithStyles<typeof styles> & IProps> {
                     <Queue queued={controller.queueItems}/>
                 </div>
                 <div className={classes.groups}>
-                    <GroupChooser groups={controller.speakerGroups} onSelect={() => {}}/>
+                    <GroupChooser controller={this.props.groupChooserController}/>
                 </div>
                 <div className={classes.browse}>
                     <SpotifyBrowser controller={this.props.browserController}/>

@@ -61,11 +61,7 @@ class SpotifyBrowser extends Component<WithStyles<typeof styles> & IProps> {
 
         let content = null;
 
-        if(controller.loading) {
-            content = (
-                <CircularProgress size={70}/>
-            )
-        } else if(controller.state === BrowserState.NOT_LINKED) {
+        if(controller.state === BrowserState.NOT_LINKED) {
             content = this.getNotLinkedContent();
         } else if(controller.state === BrowserState.LINKING) {
             content = this.getLinkingContent();
@@ -74,7 +70,7 @@ class SpotifyBrowser extends Component<WithStyles<typeof styles> & IProps> {
         }
 
         return (
-            <Section header="Spotify">
+            <Section header="Spotify" loading={controller.loading}>
                 <div className={classes.content}>
                     {content}
                 </div>

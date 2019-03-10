@@ -65,8 +65,6 @@ export class SpotifyBrowserController implements ISpotifyBrowserController {
     }
 
     private async load() {
-        this.loading = true;
-
         try {
             await this.getAccessToken();
             this.state = BrowserState.LINKED;

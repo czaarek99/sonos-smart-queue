@@ -3,6 +3,7 @@ import { createStyles, ListItem, List, Typography, WithStyles, withStyles, Paper
 import { ISpeakerGroup } from "../interfaces/services/InfoService";
 import SpeakerGroup from "./SpeakerGroup";
 import Section from "./Section";
+import { IGroupChooserController } from "../interfaces/controllers/GroupChooserController";
 
 const styles = createStyles({
     heading: {
@@ -20,29 +21,28 @@ const styles = createStyles({
 });
 
 interface IProps {
-    groups: ISpeakerGroup[],
-    onSelect: (id: string) => void
-    selectedId?: string,
+    controller: IGroupChooserController
 }
 
 class GroupChooser extends Component<WithStyles<typeof styles> & IProps> {
 
     public render() : ReactNode {
-        const { classes } = this.props;
+        const { classes, controller } = this.props;
 
-        const groups = this.props.groups.map((group, index) => {
+        const groups = controller.groups.map((group, index) => {
             const names = group.speakers.map((speaker) => {
                 return speaker.name;
             });
 
             const onClick = () => {
-                this.props.onSelect(group.id)
+                controller.onSelect(group.id)
             };
 
             return (
                 <ListItem onClick={onClick} 
                     disableGutters={true} 
-                    key={index}
+                    key={group.id}
+                    selected={controller.selectedId === group.id}
                     className={classes.speakerGroup}>
 
                     <SpeakerGroup groupName={"Group " + index} speakerNames={names} />
@@ -51,7 +51,7 @@ class GroupChooser extends Component<WithStyles<typeof styles> & IProps> {
         });
 
         return (
-            <Section header="Group Selection">
+            <Section header="Group Selection" loading={controller.loading}>
                 <List disablePadding={true} className={classes.list}>
                     {groups}
                 </List>

@@ -13,6 +13,7 @@ import { SpotifyBrowserController } from '../controllers/SpotifyBrowserControlle
 import { AppController } from '../controllers/AppController';
 import { observable } from 'mobx';
 import { ControlController } from '../controllers/ControlController';
+import { GroupChooserController } from '../controllers/GroupChooserController';
 
 const styles = createStyles({
 	"@global": {
@@ -52,7 +53,8 @@ class App extends Component<IProps & WithStyles<typeof styles>> {
 		if(this.controller.loggedIn) {
             content = (
                 <SmartQueue controller={new SmartQueueController(this.controller)} 
-                    controlController={new ControlController()}
+					controlController={new ControlController()}
+					groupChooserController={new GroupChooserController(this.controller)}
                     browserController={new SpotifyBrowserController(this.controller)}/>
             )
 		} else {

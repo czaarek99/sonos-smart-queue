@@ -72,6 +72,10 @@ export class AppController {
         return this.groupId;
     }
 
+    public setGroupId(id: string) {
+        this.groupId = id;
+    }
+
     public async refreshQueue() : Promise<void> {
         this.queueItems = await this.services.queueService.getQueue(this.groupId);
     }
