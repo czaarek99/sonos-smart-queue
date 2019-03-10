@@ -44,7 +44,8 @@ const styles = (theme: Theme) => createStyles({
         gridArea: "groups",
     },
     nav: {
-        gridArea: "nav"
+        gridArea: "nav",
+        margin: `-${GRID_GAP} -${GRID_GAP} 0 -${GRID_GAP}`
     },
     browse: {
         gridArea: "browse",

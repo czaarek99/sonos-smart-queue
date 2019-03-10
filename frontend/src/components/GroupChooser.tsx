@@ -2,7 +2,6 @@ import React, { Component, ReactNode } from "react";
 import { createStyles, ListItem, List, Typography, WithStyles, withStyles, Paper } from "@material-ui/core";
 import { ISpeakerGroup } from "../interfaces/services/InfoService";
 import SpeakerGroup from "./SpeakerGroup";
-import Heading from "./Heading";
 import Section from "./Section";
 
 const styles = createStyles({
@@ -10,13 +9,14 @@ const styles = createStyles({
         textAlign: "center",
         paddingBottom: "10px"
     },
-    container: {
-        height: "100%"
+    list: {
+        height: "100%",
+        overflow: "scroll"
     },
     speakerGroup: {
         cursor: "pointer",
-        paddingTop: "0"
-    }
+        padding: "0"
+    },
 });
 
 interface IProps {
@@ -52,7 +52,7 @@ class GroupChooser extends Component<WithStyles<typeof styles> & IProps> {
 
         return (
             <Section header="Group Selection">
-                <List disablePadding={true} >
+                <List disablePadding={true} className={classes.list}>
                     {groups}
                 </List>
             </Section>

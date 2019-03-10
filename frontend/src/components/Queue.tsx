@@ -13,6 +13,10 @@ const styles = createStyles({
     listItem: {
         padding: "0"
     },
+    list: {
+        overflow: "scroll",
+        height: "100%"
+    },
     queueText: {
         width: "270px",
         textAlign: "center"
@@ -37,7 +41,7 @@ class Queue extends Component<WithStyles<typeof styles> & IProps> {
         let content = null;
         if(queuedItems.length > 0) {
             content = (
-                <List disablePadding={true}>
+                <List disablePadding={true} className={classes.list}>
                     {queuedItems}
                 </List>
             )
