@@ -9,7 +9,9 @@ const styles = createStyles({
     content: {
         height: "100%",
         display: "flex",
-        padding: "10px 10px 0 10px"
+        padding: "10px 10px 0 10px",
+        justifyContent: "center",
+        alignItems: "center"
     },
     linkPaper: {
         padding: "5px",
@@ -45,8 +47,6 @@ class SpotifyBrowser extends Component<WithStyles<typeof styles> & IProps> {
     }
 
     private getLinkingContent() : ReactNode {
-        const { classes, controller } = this.props;
-
         return (
             <Paper>
                 <Typography>

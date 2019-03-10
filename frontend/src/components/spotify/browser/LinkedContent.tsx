@@ -1,5 +1,5 @@
 import React, { Component, ReactNode } from "react";
-import { createStyles, WithStyles, withStyles, ListItem, TextField, List, BottomNavigation, BottomNavigationAction } from "@material-ui/core";
+import { createStyles, WithStyles, withStyles, ListItem, TextField, List, BottomNavigation, BottomNavigationAction, CircularProgress, LinearProgress, IconButton } from "@material-ui/core";
 import { ISpotifyImage } from "../../../interfaces/services/SpotifyService";
 import { ISpotifyBrowserController, SearchPage } from "../../../interfaces/controllers/SpotifyBrowserController";
 import { QueueItemType } from "../../../interfaces/services/QueueService";
@@ -9,6 +9,7 @@ import ViewListIcon from "@material-ui/icons/ViewList";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import AlbumIcon from "@material-ui/icons/Album";
 import SwipeView from "react-swipeable-views";
+import SearchIcon from "@material-ui/icons/Search"
 import { observer } from "mobx-react";
 
 const styles = createStyles({
@@ -16,9 +17,10 @@ const styles = createStyles({
         height: "100%",
         width: "100%",
         display: "grid",
-        gridTemplateRows: "min-content 1fr min-content"
+        gridTemplateRows: "min-content 1fr min-content min-content"
     },
     spotifySearch: {
+        zIndex: 2,
         width: "100%"
     },
     searchInputContainer: {
@@ -29,11 +31,17 @@ const styles = createStyles({
     },
     swipe: {
         marginTop: "5px",
+        position: "relative"
     },
     resultList: {
         overflow: "scroll",
+    },
+    progress: {
+        height: "6px",
+        top: "-2px",
+        position: "relative"
     }
-})
+});
 
 interface IResultItem {
     id: string,
@@ -124,6 +132,13 @@ class LinkedContent extends Component<WithStyles<typeof styles> & IProps> {
             )
         })
 
+        let progress = <div />;
+        if(controller.searching) {
+            progress = (
+                <LinearProgress className={classes.progress} />
+            )
+        } 
+
         return (
             <div className={classes.linkedContent}>
                 <TextField label="Search spotify"
@@ -159,6 +174,7 @@ class LinkedContent extends Component<WithStyles<typeof styles> & IProps> {
                         icon={<AlbumIcon />} 
                         value={SearchPage.ALBUMS}/>
                 </BottomNavigation>
+                {progress}
             </div>
         )
     }
