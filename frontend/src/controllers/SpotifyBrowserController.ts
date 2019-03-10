@@ -92,7 +92,9 @@ export class SpotifyBrowserController implements ISpotifyBrowserController {
         const token = await this.getAccessToken();
         //TODO: Make groupids work properly
         await this.appController.getServices()
-            .queueService.addToQueue(token, "test", id, type);
+            .queueService.addToQueue(
+                token, this.appController.getGroupId(), id, type);
+        await this.appController.refreshQueue();
     }
 
     public async onSearch(query: string) : Promise<void> {

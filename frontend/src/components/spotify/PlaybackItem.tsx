@@ -14,7 +14,7 @@ const styles = createStyles({
         alignItems: "center",
         columnGap: "10px",
         margin: "5px",
-        minWidth: "200px"
+        minWidth: "240px"
     },
     albumContainer: {
         gridColumn: "1",

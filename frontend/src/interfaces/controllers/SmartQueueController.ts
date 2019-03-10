@@ -5,5 +5,7 @@ export interface ISmartQueueController {
     readonly speakerGroups: ISpeakerGroup[]
     readonly queueItems: IQueuedSong[]
     readonly loading: boolean;
-    groupId: string;
+    readonly groupId: string;
+
+    refreshQueue: () => Promise<void>
 }

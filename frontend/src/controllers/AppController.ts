@@ -1,7 +1,7 @@
 import { KeyStore } from "../storage/KeyStore";
 import { observable, computed } from "mobx";
 import { IAuthenticationService } from "../interfaces/services/AuthenticationService";
-import { IQueueService } from "../interfaces/services/QueueService";
+import { IQueueService, IQueuedSong } from "../interfaces/services/QueueService";
 import { IInfoService } from "../interfaces/services/InfoService";
 import { ISpotifyService } from "../interfaces/services/SpotifyService";
 import { AuthenticationService } from "../services/AuthenticationService";
@@ -25,7 +25,9 @@ export class AppController {
 
     private services: IServices;
     private accessToken: string;
-    @observable globalStorage = new KeyStore<IGlobalData>(localStorage, "global");
+    private groupId = "test";
+    @observable private queueItems: IQueuedSong[] = [];
+    @observable private globalStorage = new KeyStore<IGlobalData>(localStorage, "global");
     @observable public loggedIn = false;
 
     constructor() {
@@ -36,7 +38,7 @@ export class AppController {
             this.createServices();
         }
 
-        this.load();
+        this.load() ;
     }
 
     private createServices() : void {
@@ -60,6 +62,18 @@ export class AppController {
         return {
             ...this.services
         };
+    }
+
+    public getQueue() : IQueuedSong[] {
+        return this.queueItems;
+    }
+
+    public getGroupId() : string {
+        return this.groupId;
+    }
+
+    public async refreshQueue() : Promise<void> {
+        this.queueItems = await this.services.queueService.getQueue(this.groupId);
     }
 
     private async load() : Promise<void> {
