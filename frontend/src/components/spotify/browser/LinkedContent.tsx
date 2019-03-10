@@ -8,13 +8,15 @@ import MusicNoteIcon from "@material-ui/icons/MusicNote";
 import ViewListIcon from "@material-ui/icons/ViewList";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import AlbumIcon from "@material-ui/icons/Album";
+import SwipeView from "react-swipeable-views";
+import { observer } from "mobx-react";
 
 const styles = createStyles({
     linkedContent: {
         height: "100%",
         width: "100%",
-        display: "flex",
-        flexDirection: "column"
+        display: "grid",
+        gridTemplateRows: "min-content 1fr min-content"
     },
     spotifySearch: {
         width: "100%"
@@ -25,11 +27,11 @@ const styles = createStyles({
     resultListItem: {
         padding: 0
     },
+    swipe: {
+        marginTop: "5px",
+    },
     resultList: {
         overflow: "scroll",
-        flex: "1 0",
-        maxHeight: "100%",
-        marginTop: "5px"
     }
 })
 
@@ -45,6 +47,7 @@ interface IProps {
     controller: ISpotifyBrowserController
 }
 
+@observer
 class LinkedContent extends Component<WithStyles<typeof styles> & IProps> {
 
     public render() : ReactNode {
@@ -130,9 +133,11 @@ class LinkedContent extends Component<WithStyles<typeof styles> & IProps> {
                     type="search" 
                     className={classes.spotifySearch}/>
 
-                <List className={classes.resultList}>
-                    {listItems}
-                </List>
+                <SwipeView>
+                    <List className={classes.resultList}>
+                        {listItems}
+                    </List>
+                </SwipeView>
 
                 <BottomNavigation showLabels={true} 
                     onChange={onNav} 
