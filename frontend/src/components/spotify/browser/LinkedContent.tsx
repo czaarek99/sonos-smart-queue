@@ -1,27 +1,15 @@
 import React, { Component, ReactNode } from "react";
-import { Paper, Typography, Button, createStyles, WithStyles, withStyles, CircularProgress, TextField, List, ListItem, BottomNavigation, BottomNavigationAction } from "@material-ui/core";
-import { ISpotifyBrowserController, BrowserState } from "../../interfaces/controllers/SpotifyBrowserController";
-import Section from "../Section";
-import { observer } from "mobx-react";
-import PlaybackItem from "./PlaybackItem";
-import MusicNoteIcon from "@material-ui/icons/MusicNote"
-import ViewListIcon from "@material-ui/icons/ViewList"
-import AccountCircleIcon from "@material-ui/icons/AccountCircle"
-import AlbumIcon from "@material-ui/icons/Album"
-import { SearchPage } from "../../controllers/SpotifyBrowserController";
-import { ISpotifyImage } from "../../interfaces/services/SpotifyService";
-import { QueueItemType } from "../../interfaces/services/QueueService";
+import { createStyles, WithStyles, withStyles, ListItem, TextField, List, BottomNavigation, BottomNavigationAction } from "@material-ui/core";
+import { ISpotifyImage } from "../../../interfaces/services/SpotifyService";
+import { ISpotifyBrowserController, SearchPage } from "../../../interfaces/controllers/SpotifyBrowserController";
+import { QueueItemType } from "../../../interfaces/services/QueueService";
+import PlaybackItem from "../PlaybackItem";
+import MusicNoteIcon from "@material-ui/icons/MusicNote";
+import ViewListIcon from "@material-ui/icons/ViewList";
+import AccountCircleIcon from "@material-ui/icons/AccountCircle";
+import AlbumIcon from "@material-ui/icons/Album";
 
 const styles = createStyles({
-    content: {
-        height: "100%",
-        display: "flex",
-        padding: "10px 10px 0 10px"
-    },
-    linkPaper: {
-        padding: "5px",
-        textAlign: "center"
-    },
     linkedContent: {
         height: "100%",
         width: "100%",
@@ -43,11 +31,7 @@ const styles = createStyles({
         maxHeight: "100%",
         marginTop: "5px"
     }
-});
-
-interface IProps {
-    controller: ISpotifyBrowserController    
-}
+})
 
 interface IResultItem {
     id: string,
@@ -57,10 +41,13 @@ interface IResultItem {
     onClick?: () => void
 }
 
-@observer
-class SpotifyBrowser extends Component<WithStyles<typeof styles> & IProps> {
+interface IProps {
+    controller: ISpotifyBrowserController
+}
 
-    private getLinkedContent() : ReactNode {
+class LinkedContent extends Component<WithStyles<typeof styles> & IProps> {
+
+    public render() : ReactNode {
         const { classes, controller } = this.props;
 
         const results : IResultItem[] = [];
@@ -170,64 +157,6 @@ class SpotifyBrowser extends Component<WithStyles<typeof styles> & IProps> {
             </div>
         )
     }
-
-    private getNotLinkedContent() : ReactNode {
-        const { classes, controller } = this.props;
-
-        const onClick = () => {
-            controller.onLink();
-        };
-
-        return (
-            <Paper className={classes.linkPaper}>
-                <Typography>
-                    Please click the button below to link your spotify account.
-                </Typography>
-                <Button color="primary" onClick={onClick}>
-                    Link
-                </Button>
-            </Paper>
-        );
-    }
-
-    private getLinkingContent() : ReactNode {
-        const { classes, controller } = this.props;
-
-        return (
-            <Paper>
-                <Typography>
-                    Redirecting to spotify for authentication...
-                </Typography>
-            </Paper>
-        )
-    }
-
-    public render() : ReactNode {
-        const { controller, classes } = this.props;
-
-        let content = null;
-
-        if(controller.loading) {
-            content = (
-                <CircularProgress size={70}/>
-            )
-        } else if(controller.state === BrowserState.NOT_LINKED) {
-            content = this.getNotLinkedContent();
-        } else if(controller.state === BrowserState.LINKING) {
-            content = this.getLinkingContent();
-        } else if(controller.state === BrowserState.LINKED) {
-            content = this.getLinkedContent();
-        }
-
-        return (
-            <Section header="Spotify">
-                <div className={classes.content}>
-                    {content}
-                </div>
-            </Section>
-        )
-    }
-
 }
 
-export default withStyles(styles)(SpotifyBrowser);
+export default withStyles(styles)(LinkedContent);

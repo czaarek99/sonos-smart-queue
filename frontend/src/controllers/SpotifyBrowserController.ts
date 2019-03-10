@@ -1,4 +1,4 @@
-import { ISpotifyBrowserController, BrowserState } from "../interfaces/controllers/SpotifyBrowserController";
+import { ISpotifyBrowserController, BrowserState, SearchPage } from "../interfaces/controllers/SpotifyBrowserController";
 import { observable } from "mobx";
 import { IAccessToken, ISpotifyService } from "../interfaces/services/SpotifyService";
 import { KeyStore } from "../storage/KeyStore";
@@ -8,13 +8,6 @@ import { QueueItemType } from "../interfaces/services/QueueService";
 interface IBrowserData {
     accessToken: string,
     accessTokenExpiration: string
-}
-
-export enum SearchPage {
-    SONGS = 0,
-    PLAYLISTS = 1,
-    ARTISTS = 2,
-    ALBUMS = 3
 }
 
 const MIN_SEARCH_LENGTH = 2;

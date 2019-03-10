@@ -7,6 +7,13 @@ export enum BrowserState {
     LINKED
 }
 
+export enum SearchPage {
+    SONGS = 0,
+    PLAYLISTS = 1,
+    ARTISTS = 2,
+    ALBUMS = 3
+}
+
 export interface ISpotifyBrowserController {
     readonly state: BrowserState
     readonly loading: boolean

@@ -6,7 +6,7 @@ import Navbar from "../Navbar";
 import Queue from "../Queue";
 import { ISmartQueueController } from "../../interfaces/controllers/SmartQueueController";
 import GroupChooser from "../GroupChooser";
-import SpotifyBrowser from "../spotify/SpotifyBrowser";
+import SpotifyBrowser from "../spotify/browser/SpotifyBrowser";
 import { ISpotifyBrowserController } from "../../interfaces/controllers/SpotifyBrowserController";
 import Control from "../Control";
 import { IControlController } from "../../interfaces/controllers/ControlController";
