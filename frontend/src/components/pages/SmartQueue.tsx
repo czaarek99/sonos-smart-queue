@@ -15,21 +15,24 @@ const GRID_GAP = "10px";
 
 const styles = (theme: Theme) => createStyles({
     container: {
-        height: "100%",
-        display: "flex",
         flexDirection: "column"
     },
     grid: {
+        height: "100vh",
         display: "grid",
-        gridTemplateColumns: "min-content min-content auto",
-        gridTemplateRows: "min-content auto",
+        gridTemplateColumns: "min-content min-content 1fr",
+        gridTemplateRows: "min-content min-content 1fr",
         gridTemplateAreas: `
+            "nav nav nav"
             "control control control"
             "groups queue browse"
         `,
         gridGap: GRID_GAP,
         padding: GRID_GAP,
-        flexGrow: 1
+        minHeight: "0",
+        "& > *": {
+            minHeight: "0"
+        }
     },
     queue: {
         gridArea: "queue",
@@ -40,8 +43,10 @@ const styles = (theme: Theme) => createStyles({
     groups: {
         gridArea: "groups",
     },
+    nav: {
+        gridArea: "nav"
+    },
     browse: {
-        maxHeight: "inherit",
         gridArea: "browse",
     }
 })
@@ -59,21 +64,21 @@ class SmartQueue extends Component<WithStyles<typeof styles> & IProps> {
         const { classes, controller } = this.props;
 
         return (
-            <div className={classes.container}>
-                <Navbar />
-                <div className={classes.grid}>
-                    <div className={classes.control}>
-                        <Control controller={this.props.controlController}/>
-                    </div>
-                    <div className={classes.queue}>
-                        <Queue queued={controller.queueItems}/>
-                    </div>
-                    <div className={classes.groups}>
-                        <GroupChooser groups={controller.speakerGroups} onSelect={() => {}}/>
-                    </div>
-                    <div className={classes.browse}>
-                        <SpotifyBrowser controller={this.props.browserController}/>
-                    </div>
+            <div className={classes.grid}>
+                <div className={classes.nav}>
+                    <Navbar />
+                </div>
+                <div className={classes.control}>
+                    <Control controller={this.props.controlController}/>
+                </div>
+                <div className={classes.queue}>
+                    <Queue queued={controller.queueItems}/>
+                </div>
+                <div className={classes.groups}>
+                    <GroupChooser groups={controller.speakerGroups} onSelect={() => {}}/>
+                </div>
+                <div className={classes.browse}>
+                    <SpotifyBrowser controller={this.props.browserController}/>
                 </div>
             </div>
         )

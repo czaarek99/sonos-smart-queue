@@ -20,13 +20,13 @@ const styles = createStyles({
 			margin: 0
 		},
 		body: {
-			height: "100%"
+			height: "100vh"
 		},
 		html: {
-			height: "100%"
+			height: "100vh"
 		},
 		"#root": {
-			height: "100%"
+			height: "100vh"
 		},
 		"*": {
 			boxSizing: "border-box"
