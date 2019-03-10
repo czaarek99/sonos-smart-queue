@@ -14,9 +14,6 @@ import { IControlController } from "../../interfaces/controllers/ControlControll
 const GRID_GAP = "10px";
 
 const styles = (theme: Theme) => createStyles({
-    container: {
-        flexDirection: "column"
-    },
     grid: {
         height: "100vh",
         display: "grid",
@@ -34,6 +31,10 @@ const styles = (theme: Theme) => createStyles({
             minHeight: "0"
         }
     },
+    nav: {
+        gridArea: "nav",
+        margin: `-${GRID_GAP} -${GRID_GAP} 0 -${GRID_GAP}`
+    },
     queue: {
         gridArea: "queue",
     },
@@ -42,10 +43,6 @@ const styles = (theme: Theme) => createStyles({
     },
     groups: {
         gridArea: "groups",
-    },
-    nav: {
-        gridArea: "nav",
-        margin: `-${GRID_GAP} -${GRID_GAP} 0 -${GRID_GAP}`
     },
     browse: {
         gridArea: "browse",
