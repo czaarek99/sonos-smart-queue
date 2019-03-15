@@ -40,32 +40,32 @@ interface IProps {}
 @observer
 class App extends Component<IProps & WithStyles<typeof styles>> {
 
-    @observable private readonly controller: AppController;
+	@observable private readonly controller: AppController;
 
-    constructor(props) {
-        super(props);
-        this.controller = new AppController();
-    }
+	constructor(props) {
+		super(props);
+		this.controller = new AppController();
+	}
 
 	render() : ReactNode {
 		let content = null;
 
 		if(this.controller.loggedIn) {
-            content = (
-                <SmartQueue controller={new SmartQueueController(this.controller)} 
+			content = (
+				<SmartQueue controller={new SmartQueueController(this.controller)} 
 					controlController={new ControlController()}
 					groupChooserController={new GroupChooserController(this.controller)}
-                    browserController={new SpotifyBrowserController(this.controller)}/>
-            )
+					browserController={new SpotifyBrowserController(this.controller)}/>
+			)
 		} else {
 			content = <Login controller={new LoginController(this.controller)}/>;
 		}
 
 		return (
-            <MuiThemeProvider theme={theme}>
-                <CssBaseline />
-                {content}
-            </MuiThemeProvider>
+			<MuiThemeProvider theme={theme}>
+				<CssBaseline />
+				{content}
+			</MuiThemeProvider>
 		)
 	}
 }

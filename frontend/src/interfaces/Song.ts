@@ -1,5 +1,5 @@
 export interface ISong {
-    name: string
-    artistName: string
-    albumUrl: string
+	name: string
+	artistName: string
+	albumUrl: string
 }

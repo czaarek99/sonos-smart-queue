@@ -5,17 +5,17 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import { INavbarController } from "../interfaces/controllers/NavbarController";
 
 const styles = (theme: Theme) => createStyles({
-    menuButton: {
-        marginLeft: -12,
-        marginRight: 20, 
-    },
-    grow: {
-        flexGrow: 1
-    }
+	menuButton: {
+		marginLeft: -12,
+		marginRight: 20, 
+	},
+	grow: {
+		flexGrow: 1
+	}
 })
 
 interface IProps {
-    //controller: INavbarController
+	//controller: INavbarController
 }
 
 //TODO: Implement menu
@@ -23,27 +23,27 @@ interface IProps {
 
 class Navbar extends Component<WithStyles<typeof styles>> {
 
-    public render() : ReactNode {
-        const { classes } = this.props;
-        
-        return (
-            <AppBar position="static">
-                <Toolbar>
-                    <IconButton className={classes.menuButton}>
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography variant="h6" color="inherit" className={classes.grow}>
-                        Sonos Smart Queue
-                    </Typography>
-                    <div>
-                        <IconButton color="inherit">
-                            <AccountCircle />
-                        </IconButton>
-                    </div>
-                </Toolbar>
-            </AppBar>
-        )
-    }
+	public render() : ReactNode {
+		const { classes } = this.props;
+		
+		return (
+			<AppBar position="static">
+				<Toolbar>
+					<IconButton className={classes.menuButton}>
+						<MenuIcon />
+					</IconButton>
+					<Typography variant="h6" color="inherit" className={classes.grow}>
+						Sonos Smart Queue
+					</Typography>
+					<div>
+						<IconButton color="inherit">
+							<AccountCircle />
+						</IconButton>
+					</div>
+				</Toolbar>
+			</AppBar>
+		)
+	}
 
 }
 

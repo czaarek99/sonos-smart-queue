@@ -1,26 +1,35 @@
 import React, { Component, ReactNode } from "react";
-import { createStyles, WithStyles, withStyles, ListItem, TextField, List, BottomNavigation, BottomNavigationAction, CircularProgress, LinearProgress, IconButton } from "@material-ui/core";
-import { ISpotifyImage } from "../../../interfaces/services/SpotifyService";
-import { ISpotifyBrowserController, SearchPage } from "../../../interfaces/controllers/SpotifyBrowserController";
-import { QueueItemType } from "../../../interfaces/services/QueueService";
-import PlaybackItem from "../PlaybackItem";
-import MusicNoteIcon from "@material-ui/icons/MusicNote";
-import ViewListIcon from "@material-ui/icons/ViewList";
-import AccountCircleIcon from "@material-ui/icons/AccountCircle";
-import AlbumIcon from "@material-ui/icons/Album";
-import SwipeView from "react-swipeable-views";
-import SearchIcon from "@material-ui/icons/Search"
+import { Paper, Typography, Button, createStyles, WithStyles, withStyles, CircularProgress, TextField, List, ListItem, BottomNavigation, BottomNavigationAction } from "@material-ui/core";
+import { ISpotifyBrowserController, BrowserState } from "../../interfaces/controllers/SpotifyBrowserController";
+import Section from "../Section";
 import { observer } from "mobx-react";
+import PlaybackItem from "./PlaybackItem";
+import MusicNoteIcon from "@material-ui/icons/MusicNote"
+import ViewListIcon from "@material-ui/icons/ViewList"
+import AccountCircleIcon from "@material-ui/icons/AccountCircle"
+import AlbumIcon from "@material-ui/icons/Album"
+import { SearchPage } from "../../interfaces/controllers/SpotifyBrowserController";
+import { ISpotifyImage } from "../../interfaces/services/SpotifyService";
 
 const styles = createStyles({
+	content: {
+		height: "100%",
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "center",
+		padding: "10px 10px 0 10px"
+	},
+	linkPaper: {
+		padding: "5px",
+		textAlign: "center"
+	},
 	linkedContent: {
 		height: "100%",
 		width: "100%",
-		display: "grid",
-		gridTemplateRows: "min-content 1fr min-content min-content"
+		display: "flex",
+		flexDirection: "column"
 	},
 	spotifySearch: {
-		zIndex: 2,
 		width: "100%"
 	},
 	searchInputContainer: {
@@ -29,39 +38,25 @@ const styles = createStyles({
 	resultListItem: {
 		padding: 0
 	},
-	swipe: {
-		marginTop: "5px",
-		position: "relative"
-	},
 	resultList: {
 		overflow: "scroll",
-	},
-	progress: {
-		height: "6px",
-		top: "-2px",
-		position: "relative"
+		flex: "1 0",
+		maxHeight: "100%",
+		marginTop: "5px"
 	}
 });
 
-interface IResultItem {
-	id: string,
-	title: string
-	subtitle: string
-	albumArtUrl: string
-	onClick?: () => void
-}
-
 interface IProps {
-	controller: ISpotifyBrowserController
+	controller: ISpotifyBrowserController	
 }
 
 @observer
-class LinkedContent extends Component<WithStyles<typeof styles> & IProps> {
+class SpotifyBrowser extends Component<WithStyles<typeof styles> & IProps> {
 
-	public render() : ReactNode {
+	private getLinkedContent() : ReactNode {
 		const { classes, controller } = this.props;
 
-		const results : IResultItem[] = [];
+		const results = [];
 		if(controller.searchResult) {
 			const page = controller.selectedNavigation;
 
@@ -79,10 +74,7 @@ class LinkedContent extends Component<WithStyles<typeof styles> & IProps> {
 						id: track.id,
 						title: track.name,
 						subtitle: track.artists[0].name,
-						albumArtUrl: getArtwork(track.album.images),
-						onClick: () => {
-							controller.onQueue(track.id, QueueItemType.SONG)
-						}
+						albumArtUrl: getArtwork(track.album.images)
 					})
 				}
 			} else if(page === SearchPage.PLAYLISTS) {
@@ -121,23 +113,16 @@ class LinkedContent extends Component<WithStyles<typeof styles> & IProps> {
 
 		const listItems = results.map((result) => {
 			return (
-				<ListItem className={classes.resultListItem} 
-					onClick={result.onClick}
+				<ListItem className={classes.resultListItem}
 					key={result.id}
 					selected={false}
+					onClick={() => {}}
 					button={true}>
 
 					<PlaybackItem {...result}/>
 				</ListItem>
 			)
 		})
-
-		let progress = <div />;
-		if(controller.searching) {
-			progress = (
-				<LinearProgress className={classes.progress} />
-			)
-		} 
 
 		return (
 			<div className={classes.linkedContent}>
@@ -148,11 +133,9 @@ class LinkedContent extends Component<WithStyles<typeof styles> & IProps> {
 					type="search" 
 					className={classes.spotifySearch}/>
 
-				<SwipeView>
-					<List className={classes.resultList}>
-						{listItems}
-					</List>
-				</SwipeView>
+				<List className={classes.resultList}>
+					{listItems}
+				</List>
 
 				<BottomNavigation showLabels={true} 
 					onChange={onNav} 
@@ -174,10 +157,67 @@ class LinkedContent extends Component<WithStyles<typeof styles> & IProps> {
 						icon={<AlbumIcon />} 
 						value={SearchPage.ALBUMS}/>
 				</BottomNavigation>
-				{progress}
 			</div>
 		)
 	}
+
+	private getNotLinkedContent() : ReactNode {
+		const { classes, controller } = this.props;
+
+		const onClick = () => {
+			controller.onLink();
+		};
+
+		return (
+			<Paper className={classes.linkPaper}>
+				<Typography>
+					Please click the button below to link your spotify account.
+				</Typography>
+				<Button color="primary" onClick={onClick}>
+					Link
+				</Button>
+			</Paper>
+		);
+	}
+
+	private getLinkingContent() : ReactNode {
+		const { classes, controller } = this.props;
+
+		return (
+			<Paper>
+				<Typography>
+					Redirecting to spotify for authentication...
+				</Typography>
+			</Paper>
+		)
+	}
+
+	public render() : ReactNode {
+		const { controller, classes } = this.props;
+
+		let content = null;
+
+		if(controller.loading) {
+			content = (
+				<CircularProgress size={70}/>
+			)
+		} else if(controller.state === BrowserState.NOT_LINKED) {
+			content = this.getNotLinkedContent();
+		} else if(controller.state === BrowserState.LINKING) {
+			content = this.getLinkingContent();
+		} else if(controller.state === BrowserState.LINKED) {
+			content = this.getLinkedContent();
+		}
+
+		return (
+			<Section header="Spotify">
+				<div className={classes.content}>
+					{content}
+				</div>
+			</Section>
+		)
+	}
+
 }
 
-export default withStyles(styles)(LinkedContent);
+export default withStyles(styles)(SpotifyBrowser);

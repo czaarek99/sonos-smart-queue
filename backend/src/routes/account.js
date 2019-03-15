@@ -8,12 +8,12 @@ const authentication = require("../middlewares/authentication");
 const { throwIfNotValidPassword, throwIfNotValidUsername, throwIfNotStringOrEmpty } = require("../util/validation");
 
 async function respondToAuth(res, userId) {
-    const accessToken = await database.AccessToken.create({
-        token: uuid4(),
-        userId
-    });
+	const accessToken = await database.AccessToken.create({
+		token: uuid4(),
+		userId
+	});
 
-    res.status(200).send(accessToken.token);
+	res.status(200).send(accessToken.token);
 }
 
 router.put("/", async(req, res) => {
@@ -36,11 +36,11 @@ router.put("/", async(req, res) => {
 
 	const newUser = await database.User.create({
 		username,
-        password: hashedPassword,
-        uuid: uuid4() 
-    });
+		password: hashedPassword,
+		uuid: uuid4() 
+	});
 
-    respondToAuth(res, newUser.id);
+	respondToAuth(res, newUser.id);
 });
 
 router.post("/login", async(req, res) => {
@@ -73,7 +73,7 @@ router.post("/login", async(req, res) => {
 
 router.get("/tokenStatus", authentication);
 router.get("/tokenStatus", async (req, res) => {
-    res.status(200).send();
+	res.status(200).send();
 });
 
 module.exports = router;

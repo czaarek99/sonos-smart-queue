@@ -6,59 +6,59 @@ import Heading from "./Heading";
 import Section from "./Section";
 
 interface IProps {
-    queued: IQueuedSong[]
+	queued: IQueuedSong[]
 }
 
 const styles = createStyles({
-    listItem: {
-        padding: "0"
-    },
-    list: {
-        overflow: "scroll",
-        height: "100%"
-    },
-    queueText: {
-        width: "270px",
-        textAlign: "center"
-    }
+	listItem: {
+		padding: "0"
+	},
+	list: {
+		overflow: "scroll",
+		height: "100%"
+	},
+	queueText: {
+		width: "270px",
+		textAlign: "center"
+	}
 });
 
 class Queue extends Component<WithStyles<typeof styles> & IProps> {
 
-    public render() : ReactNode {
-        const classes = this.props.classes;
+	public render() : ReactNode {
+		const classes = this.props.classes;
 
-        const queuedItems = this.props.queued.map((queueItem, index) => {
-            return (
-                <ListItem key={index} className={classes.listItem}>
-                    <PlaybackItem albumArtUrl={queueItem.albumArtUrl}
-                        title={queueItem.name}
-                        subtitle={queueItem.artistName}/>
-                </ListItem>
-            )
-        });
+		const queuedItems = this.props.queued.map((queueItem, index) => {
+			return (
+				<ListItem key={index} className={classes.listItem}>
+					<PlaybackItem albumArtUrl={queueItem.albumArtUrl}
+						title={queueItem.name}
+						subtitle={queueItem.artistName}/>
+				</ListItem>
+			)
+		});
 
-        let content = null;
-        if(queuedItems.length > 0) {
-            content = (
-                <List disablePadding={true} className={classes.list}>
-                    {queuedItems}
-                </List>
-            )
-        } else {
-            content = (
-                <Typography className={classes.queueText}>
-                    Queue is empty!
-                </Typography>
-            )
-        }
+		let content = null;
+		if(queuedItems.length > 0) {
+			content = (
+				<List disablePadding={true} className={classes.list}>
+					{queuedItems}
+				</List>
+			)
+		} else {
+			content = (
+				<Typography className={classes.queueText}>
+					Queue is empty!
+				</Typography>
+			)
+		}
 
-        return (
-            <Section header="Queue">
-                {content}
-            </Section>
-        )
-    }
+		return (
+			<Section header="Queue">
+				{content}
+			</Section>
+		)
+	}
 }
 
 export default withStyles(styles)(Queue);

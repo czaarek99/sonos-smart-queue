@@ -7,45 +7,45 @@ import { AppController } from "./AppController";
 
 export class LoginController implements ILoginController {
 
-    private readonly appController: AppController;
-    @observable public error = "";
-    @observable public model = new LoginModel();
-    @observable public loading = false;
+	private readonly appController: AppController;
+	@observable public error = "";
+	@observable public model = new LoginModel();
+	@observable public loading = false;
 
-    constructor(appController: AppController) {
-        this.appController = appController;
-    }
+	constructor(appController: AppController) {
+		this.appController = appController;
+	}
 
-    public onChange(key: keyof ILoginModel, value: string) {
-        this.model[key] = value;
-    }
+	public onChange(key: keyof ILoginModel, value: string) {
+		this.model[key] = value;
+	}
 
-    public async onLogin() {
-        this.loading = true;
+	public async onLogin() {
+		this.loading = true;
 
-        try {
-            const token = await this.appController.getServices()
-                .authenticationService.logIn(this.model.username, this.model.password);
-            this.appController.setAccessToken(token)
-        } catch(error) {
-            this.error = error.body.message;
-        }
+		try {
+			const token = await this.appController.getServices()
+				.authenticationService.logIn(this.model.username, this.model.password);
+			this.appController.setAccessToken(token)
+		} catch(error) {
+			this.error = error.body.message;
+		}
 
-        this.loading = false;
-    }
+		this.loading = false;
+	}
 
-    public async onRegister() {
-        this.loading = true;
+	public async onRegister() {
+		this.loading = true;
 
-        try {
-            const token = await this.appController.getServices()
-                .authenticationService.register(this.model.username, this.model.password);
-            this.appController.setAccessToken(token);
-        } catch(error) {
-            console.error(error);
-            this.error = error.body.message;
-        }
+		try {
+			const token = await this.appController.getServices()
+				.authenticationService.register(this.model.username, this.model.password);
+			this.appController.setAccessToken(token);
+		} catch(error) {
+			console.error(error);
+			this.error = error.body.message;
+		}
 
-        this.loading = false;
-    }
+		this.loading = false;
+	}
 }

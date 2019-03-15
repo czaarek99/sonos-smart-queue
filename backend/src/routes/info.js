@@ -9,23 +9,23 @@ router.get("/groups", async (req, res) => {
 
 	for(const [id, info] of grouped) {
 		response.push({
-            id,
-            speakers: info.speakers
+			id,
+			speakers: info.speakers
 		})
 	}
 
-    res.status(200).send(response);*/
-    res.status(200).send([
-        {
-            id: "0",
-            speakers: [
-                {
-                    name: "A speaker in a group",
-                    id: "1"
-                }
-            ]
-        }
-    ]);
+	res.status(200).send(response);*/
+	res.status(200).send([
+		{
+			id: "0",
+			speakers: [
+				{
+					name: "A speaker in a group",
+					id: "1"
+				}
+			]
+		}
+	]);
 });
 
 

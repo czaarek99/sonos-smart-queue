@@ -1,4 +1,4 @@
 export interface ILoginModel {
-    readonly username: string;
-    readonly password: string;
+	readonly username: string;
+	readonly password: string;
 }

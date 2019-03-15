@@ -1,74 +1,74 @@
 export interface IAccessToken {
-    token: string,
-    expiresIn: number
+	token: string,
+	expiresIn: number
 }
 
 interface ISpotifyFollowers {
-    total: number
+	total: number
 }
 
 export interface ISpotifyImage {
-    size: number,
-    url: string
+	size: number,
+	url: string
 }
 
 interface ISpotifyTracksInfo {
-    total: number
+	total: number
 }
 
 interface ISpotifyBase {
-    id: string
-    name: string
+	id: string
+	name: string
 }
 
 interface ISpotifyArtist extends ISpotifyBase {
-    images: ISpotifyImage[]
-    followers: ISpotifyFollowers
+	images: ISpotifyImage[]
+	followers: ISpotifyFollowers
 }
 
 interface ISpotifyAlbum extends ISpotifyBase {
-    artists: ISpotifyArtist[]
-    images: ISpotifyImage[]
-    release_date: string
+	artists: ISpotifyArtist[]
+	images: ISpotifyImage[]
+	release_date: string
 }
 
 interface ISpotifyTrack extends ISpotifyBase {
-    album: ISpotifyAlbum
-    artists: ISpotifyArtist[]
-    duration: number
-    explicit: boolean
+	album: ISpotifyAlbum
+	artists: ISpotifyArtist[]
+	duration: number
+	explicit: boolean
 }
 
 interface ISpotifyPlaylist extends ISpotifyBase {
-    images: ISpotifyImage[]
-    tracks: ISpotifyTracksInfo
+	images: ISpotifyImage[]
+	tracks: ISpotifyTracksInfo
 }
 
 interface ISpotifyTracks {
-    items: ISpotifyTrack[]
+	items: ISpotifyTrack[]
 }
 
 interface ISpotifyAlbums {
-    items: ISpotifyAlbum[]
+	items: ISpotifyAlbum[]
 }
 
 interface ISpotifyArtists {
-    items: ISpotifyArtist[]
+	items: ISpotifyArtist[]
 }
 
 interface ISpotifyPlaylists {
-    items: ISpotifyPlaylist[]
+	items: ISpotifyPlaylist[]
 }
 
 export interface ISpotifySearchResponse {
-    tracks: ISpotifyTracks
-    albums: ISpotifyAlbums
-    artists: ISpotifyArtists
-    playlists: ISpotifyPlaylists
+	tracks: ISpotifyTracks
+	albums: ISpotifyAlbums
+	artists: ISpotifyArtists
+	playlists: ISpotifyPlaylists
 }
 
 export interface ISpotifyService {
-    getAccessToken: () => Promise<IAccessToken>
-    getSpotifyAuthUrl: () => Promise<string>
-    search: (query: string, token: string) => Promise<ISpotifySearchResponse>
+	getAccessToken: () => Promise<IAccessToken>
+	getSpotifyAuthUrl: () => Promise<string>
+	search: (query: string, token: string) => Promise<ISpotifySearchResponse>
 }
