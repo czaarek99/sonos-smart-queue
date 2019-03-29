@@ -1,22 +1,14 @@
 const router = require("express-promise-router")();
 const database = require("../database");
 const { throwIfNotSonosGroupId, throwIfNotStringOrEmpty } = require("../util/validation");
-const { groupIdToSonos, spotifyUriToSonosUri } = require("../util/router");
 const { getBaseClient } = require("../spotify/client");
 const { accessTokenMiddleware, refreshTokenMiddleware } = require("../middlewares/token");
 
 const MAX_QUEUE_RETURN = 50;
 
-const SONG_STATE = {
-	QUEUED: "queued",
-	STARTED_PLAYING: "started",
-	PLAYING: "playing",
-	FINISHED: "finished"
-};
-
 router.get("/list/:groupId", async (req, res) => {
 	const groupId = req.params.groupId;
-	//throwIfNotSonosGroupId(groupId);
+	throwIfNotSonosGroupId(groupId);
 
 	const today = new Date(new Date().getTime() - (16 * 60 * 60 * 1000));
 
@@ -29,7 +21,7 @@ router.get("/list/:groupId", async (req, res) => {
 		],
 		where: {
 			groupId: groupId,
-			state: SONG_STATE.QUEUED,
+			state: database.SONG_STATE.QUEUED,
 			queueDate: {
 				[database.Sequelize.Op.gt]: today
 			}

@@ -42,13 +42,19 @@ interface IProps {
 	controller: IControlController
 }
 
+const EMPTY_SONG = {
+	name: "",
+	artistName: "",
+	albumArtUrl: "/album.png",
+	duration: 0
+}
+
 @observer
 class Control extends Component<WithStyles<typeof styles> & IProps> {
 
 	public render() : ReactNode {
 
 		const { controller, classes } = this.props;
-		const playing = controller.currentlyPlaying;
 
 		let playbackIcon = <PlayArrowIcon className={classes.playbackIcon} />
 		if(controller.state === ControlState.PLAYING) {
@@ -59,14 +65,21 @@ class Control extends Component<WithStyles<typeof styles> & IProps> {
 			controller.onVolumeChange(value)
 		}
 
+		let playingSong;
+		if(controller.currentlyPlaying === null) {
+			playingSong = EMPTY_SONG;
+		} else {
+			playingSong = controller.currentlyPlaying;
+		}
+
 		return (
 			<Paper className={classes.container}>
 				<div className={classes.currentPlaybackContainer}>
-					<PlaybackItem title={playing.name}
-						subtitle={playing.artistName}
-						albumArtUrl={playing.albumUrl}/>
+					<PlaybackItem title={playingSong.name}
+						subtitle={playingSong.artistName}
+						albumArtUrl={playingSong.albumArtUrl}/>
 				</div>
-			   
+
 
 				<div className={classes.controlsContainer}>
 					<SkipPrevIcon className={classes.playbackIcon} />
@@ -75,7 +88,7 @@ class Control extends Component<WithStyles<typeof styles> & IProps> {
 				</div>
 
 				<div className={classes.volumeContainer}>
-					<Slider value={controller.volume} 
+					<Slider value={controller.volume}
 						className={classes.slider}
 						onChange={onVolumeChange}/>
 				</div>

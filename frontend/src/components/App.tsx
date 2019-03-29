@@ -50,7 +50,7 @@ class App extends Component<IProps & WithStyles<typeof styles>> {
 		super(props);
 		this.controller = new AppController();
 		this.smartQueueController = new SmartQueueController(this.controller);
-		this.controlController = new ControlController();
+		this.controlController = new ControlController(this.controller);
 		this.groupChooserController = new GroupChooserController(this.controller);
 		this.spotifyBrowserController = new SpotifyBrowserController(this.controller);
 	}

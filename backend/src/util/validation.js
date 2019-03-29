@@ -48,7 +48,7 @@ function throwIfNotValidUsername(string) {
 function throwIfNotSonosGroupId(string) {
 	throwIfNotStringOrEmpty("groupId", string);
 
-	if(!strings.startsWith("RINCON_") || !string.includes(":")) {
+	if(!string.startsWith("RINCON_") || !string.includes(":")) {
 		throw new APIError(400, "Bad group id");
 	}
 }

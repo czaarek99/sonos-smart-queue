@@ -4,8 +4,11 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const database = require("./database");
 const app = express();
+const SonosClient = require("./client");
 
 (async function() {
+	await SonosClient.initialize();
+
 	await database.sequelize.sync({
 		force: false
 	})
@@ -24,7 +27,6 @@ const app = express();
 
 	app.use("/info", require("./routes/info"));
 	app.use("/queue", require("./routes/queue"));
-	app.use("/search", require("./routes/search"));
 	app.use("/control", require("./routes/control"));
 	app.use("/volume", require("./routes/volume"));
 

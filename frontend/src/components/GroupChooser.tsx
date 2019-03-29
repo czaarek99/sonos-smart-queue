@@ -32,9 +32,15 @@ class GroupChooser extends Component<WithStyles<typeof styles> & IProps> {
 		const { classes, controller } = this.props;
 
 		const groups = controller.groups.map((group, index) => {
-			const names = group.speakers.map((speaker) => {
-				return speaker.name;
-			});
+			const names = [];
+
+			for(const speaker of group.speakers) {
+				const speakerName = speaker.name;
+
+				if(!names.includes(speakerName)) {
+					names.push(speakerName);
+				}
+			}
 
 			const onClick = () => {
 				controller.onSelect(group.id)

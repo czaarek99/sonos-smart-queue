@@ -1,31 +1,48 @@
 const router = require("express-promise-router")();
-const client = require("../client");
+const { throwIfNotSonosGroupId } = require("../util/validation");
+const SonosClient = require("../client");
+const database = require("../database");
+const ApiError = require("../util/APIError");
 const util = require("util");
 
-//Application has to cache this
 router.get("/groups", async (req, res) => {
-	const grouped = await client.getGroupedClients();
+	const groups = SonosClient.getSpeakerGroups();
 	const response = [];
 
-	for(const [id, info] of grouped) {
+	for(const [id, device] of groups) {
 		response.push({
 			id,
-			speakers: info.speakers
+			speakers: device.members
 		})
 	}
 
 	res.status(200).send(response);
-	/*res.status(200).send([
-		{
-			id: "test",
-			speakers: [
-				{
-					name: "A speaker in a group",
-					id: "fake speaker"
-				}
-			]
+});
+
+router.get("/playing/:groupId", async (req, res) => {
+	const groupId = req.params.groupId;
+	throwIfNotSonosGroupId(groupId);
+
+	const song = await database.QueuedSong.findOne({
+		where: {
+			groupId,
+			state: database.SONG_STATE.PLAYING
 		}
-	]);*/
+	});
+
+	if(song) {
+		res.status(200).send({
+			name: song.name,
+			artistName: song.artistName,
+			albumArtUrl: song.albumArtUrl,
+		});
+	} else {
+		res.status(200).send({
+			name: "",
+			artistName: "",
+			albumArtUrl: "/album.png"
+		});
+	}
 });
 
 

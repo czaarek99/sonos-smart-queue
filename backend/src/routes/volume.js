@@ -1,10 +1,19 @@
 const router = require("express-promise-router")();
-const { groupIdToSonos } = require("../util/router");
+const { throwIfNotSonosGroupId } = require("../util/validation");
+const SonosClient = require("../client");
+const APIError = require("../util/APIError");
 
 router.get("/:groupId", async (req, res) => {
+	const groupId = req.params.groupId;
+	throwIfNotSonosGroupId(groupId);
+	const coordinator = SonosClient.getCoordinatorByGroupId(groupId);
 
-	const sonos = await groupIdToSonos(req.params.groupId);
-	const volume = await sonos.getVolume();
+	if(coordinator === null) {
+		throw new APIError(404, "No such groupid");
+	}
+
+	const volume = await coordinator.getVolume();
+
 	res.status(200).send({
 		volume
 	});

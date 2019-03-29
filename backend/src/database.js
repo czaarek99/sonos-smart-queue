@@ -53,6 +53,13 @@ defineModel("User", {
 	}
 });
 
+dbExports.SONG_STATE = {
+	QUEUED: "queued",
+	STARTED_PLAYING: "started",
+	PLAYING: "playing",
+	FINISHED: "finished"
+};
+
 defineModel("QueuedSong", {
 	groupId: {
 		type: DataTypes.STRING
@@ -134,16 +141,16 @@ dbExports.logAction = (req, action, data) => {
 	let query = {
 		action, data
 	};
-	
+
 	if (req) {
 		if (req.session && req.session.userId) {
 			query.userId = req.session.userId;
 		}
-		
+
 		query.ip = req.ip;
 	}
-	
-	
+
+
 	return dbExports.Log.create(query);
 };
 

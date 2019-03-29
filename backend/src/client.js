@@ -1,83 +1,114 @@
-const {DeviceDiscovery, Sonos} = require("sonos");
+const { DeviceDiscovery, Sonos } = require("sonos");
 
-class SonosError extends Error {
-}
+class SonosClient {
 
-async function getMainDevice() {
-	return new Promise((resolve, reject) => {
-		DeviceDiscovery().once("DeviceAvailable", (device) => {
-			resolve(device);
-		});
-	})
-}
+	constructor() {
+		this.speakerGroups = new Map();
+		this.currentlyPlaying = new Map();
+	}
 
-function getZoneMemberIP(zoneMember) {
-	return zoneMember.Location.replace("http://", "").replace(":1400/xml/device_description.xml", "");
-}
-
-async function getGroupedClients() {
-	const mainDevice = await getMainDevice();
-	const groups = await mainDevice.getAllGroups();
-	const groupedDevices = new Map();
-
-	for (const group of groups) {
-
-		const speakers = [];
-		let coordinatorUrl = null;
-
-		if(Array.isArray(group.ZoneGroupMember)) {
-			for (const zoneMember of group.ZoneGroupMember) {
-				speakers.push({
-					name: zoneMember.ZoneName,
-					id: zoneMember.UUID
-				});
-
-				if (zoneMember.UUID === group.Coordinator) {
-					coordinatorUrl = getZoneMemberIP(zoneMember);
-					break;
-				}
-			}
-		} else {
-			const member = group.ZoneGroupMember;
-			coordinatorUrl = getZoneMemberIP(member);
-
-			speakers.push({
-				name: member.ZoneName,
-				id: member.UUID
+	async getMainDevice() {
+		return new Promise((resolve) => {
+			DeviceDiscovery().once("DeviceAvailable", (device) => {
+				resolve(device);
 			});
+		})
+	}
+
+	async initialize() {
+		this.recache();
+
+		setInterval(() => {
+			this.recache();
+		}, 20 * 1000)
+	}
+
+	getSpeakerGroups() {
+		return this.speakerGroups;
+	}
+
+	getDeviceByGroupId(groupId) {
+		return this.speakerGroups.get(groupId);
+	}
+
+	getCurrentlyPlaying(groupId) {
+		return this.currentlyPlaying.get(groupId);
+	}
+
+	getCoordinatorByGroupId(groupId) {
+		const device = this.getDeviceByGroupId(groupId);
+		if(device === null) {
+			return null;
+		} else {
+			return device.coordinator;
+		}
+	}
+
+	async recache() {
+		const mainDevice = await this.getMainDevice();
+		const groups = await mainDevice.getAllGroups();
+
+		for(const device of this.speakerGroups.values()) {
+			device.coordinator.removeListener("CurrentTrack", device.trackListener)
 		}
 
-		if (coordinatorUrl === null) {
-			throw new Error("Could not find coordinator in zone members")
-		} else {
-			groupedDevices.set(group.ID, {
-				speakers,
-				coordinatorUrl
+		this.speakerGroups.clear();
+
+		for (const group of groups) {
+			const groupId = group.ID;
+			let coordinatorUrl = null;
+
+			const groupMembers = [];
+			if(Array.isArray(group.ZoneGroupMember)) {
+				if(group.ZoneGroupMember[0].ZoneName === "BOOST")  {
+					continue;
+				}
+
+				groupMembers.push(...group.ZoneGroupMember);
+			} else {
+				groupMembers.push(group.ZoneGroupMember);
+			}
+
+			const members = groupMembers.map((member) => {
+				if(member.UUID === group.Coordinator) {
+					coordinatorUrl = this.getZoneMemberIP(member);
+				}
+
+				return {
+					id: member.UUID,
+					name: member.ZoneName,
+				}
+			});
+
+			if (coordinatorUrl === null) {
+				throw new Error("Could not find coordinator in zone members")
+			}
+
+			const coordinator = new Sonos(coordinatorUrl);
+
+			const onCurrentTrack = (track) => {
+				this.currentlyPlaying.set(groupId, {
+					name: track.title,
+					artistName: track.artist,
+					duration: track.duration,
+					albumArtUrl: track.albumArtURI
+				})
+			}
+
+			coordinator.addListener("CurrentTrack", onCurrentTrack)
+
+			this.speakerGroups.set(groupId, {
+				coordinator,
+				members,
+				trackListener: onCurrentTrack
 			})
 		}
 	}
-	return groupedDevices;
-}
 
-async function getClientByGroupId(groupId) {
-	const clients = await getGroupedClients();
-	const client = clients.get(groupId);
-	if (client === undefined) {
-		throw new SonosError("No such group")
+	getZoneMemberIP(zoneMember) {
+		return zoneMember.Location.replace("http://", "").replace(":1400/xml/device_description.xml", "");
 	}
-	return client;
+
 }
 
-async function getSonosByGroupId(groupId) {
-	const client = await getClientByGroupId(groupId);
-	return new Sonos(client.coordinatorUrl);
-}
-
-module.exports = {
-	getMainDevice,
-	getGroupedClients,
-	getClientByGroupId,
-	getClientByGroupId,
-	getSonosByGroupId,
-	SonosError
-}
+module.exports = new SonosClient();

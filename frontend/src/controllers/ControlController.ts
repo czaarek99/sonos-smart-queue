@@ -1,24 +1,34 @@
 import { IControlController, ControlState } from "../interfaces/controllers/ControlController";
 import { observable } from "mobx";
-
-const EMPTY_SONG = {
-	name: "",
-	artistName: "",
-	albumUrl: "/album.png"
-}
+import { AppController } from "./AppController";
+import { ISong } from "../interfaces/Song";
 
 export class ControlController implements IControlController {
 
-	@observable public currentlyPlaying = EMPTY_SONG;
+	private readonly appController: AppController;
+	@observable public currentlyPlaying : ISong = null;
 	@observable public state = ControlState.INACTIVE;
 	@observable public volume = 50;
 
-	constructor() {
-
+	constructor(appController: AppController) {
+		this.appController = appController;
+		this.load();
 	}
 
 	private async load() {
+		this.updatePlaying();
 
+		setInterval(() => {
+			this.updatePlaying();
+		}, 1000)
+	}
+
+	private async updatePlaying() {
+		const groupId = this.appController.getGroupId();
+		if(groupId) {
+			this.currentlyPlaying = await this.appController.getServices()
+				.infoService.getCurrentlyPlaying(groupId);
+		}
 	}
 
 	public onPause() {
