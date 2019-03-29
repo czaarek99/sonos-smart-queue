@@ -24,7 +24,7 @@ export class GroupChooserController implements IGroupChooserController {
 
 		window.setInterval(async () => {
 			await this.refreshGroups();
-		}, 15 * 1000)
+		}, 60 * 1000)
 
 		this.appController.setGroupId(this.groups[0].id);
 	}

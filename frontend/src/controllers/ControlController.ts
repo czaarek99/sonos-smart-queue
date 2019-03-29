@@ -13,6 +13,14 @@ export class ControlController implements IControlController {
 	@observable public state = ControlState.INACTIVE;
 	@observable public volume = 50;
 
+	constructor() {
+
+	}
+
+	private async load() {
+
+	}
+
 	public onPause() {
 		this.state = ControlState.PAUSED;
 	}

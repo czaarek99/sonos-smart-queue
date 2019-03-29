@@ -25,7 +25,7 @@ export class AppController {
 
 	private services: IServices;
 	private accessToken: string;
-	@observable private groupId = "test";
+	@observable private groupId = null;
 	@observable private queueItems: IQueuedSong[] = [];
 	@observable private globalStorage = new KeyStore<IGlobalData>(localStorage, "global");
 	@observable public loggedIn = false;
@@ -74,10 +74,13 @@ export class AppController {
 
 	public setGroupId(id: string) {
 		this.groupId = id;
+		this.refreshQueue();
 	}
 
 	public async refreshQueue() : Promise<void> {
-		this.queueItems = await this.services.queueService.getQueue(this.groupId);
+		if(this.groupId !== null) {
+			this.queueItems = await this.services.queueService.getQueue(this.groupId);
+		}
 	}
 
 	private async load() : Promise<void> {
