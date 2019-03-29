@@ -48,7 +48,7 @@ router.use(refreshTokenMiddleware);
 function getAlbumArtUrl(images) {
 	if(images.length > 0) {
 		return images[0].url;
-	} 
+	}
 
 	return null;
 }
@@ -84,10 +84,11 @@ router.put("/add/:groupId/", async (req, res) => {
 
 	const songsToInsert = [];
 	if(type === "album") {
-		const album = await client.getAlbum(id);
-
-		for(const song of album.tracks) {
-			const albumArtUrl = getAlbumArtUrl(song.album.images);
+		const response = await client.getAlbum(id);
+		const album = response.body;
+		console.log("test");
+		for(const song of album.tracks.items) {
+			const albumArtUrl = getAlbumArtUrl(album.images);
 
 			songsToInsert.push({
 				...baseObject,
@@ -99,23 +100,7 @@ router.put("/add/:groupId/", async (req, res) => {
 			})
 		}
 	} else {
-		const songObjects = [];
-
-		if(type === "song") {
-			const response = await client.getTrack(id);
-			const song = response.body;
-			songObjects.push(song);
-		} else if(type === "playlist") {
-			const response = await client.getPlaylist(id);
-			const playlist = response.body;
-			songObjects.push(...playlist.tracks.items);
-		} else if(type === "artist") {
-			const response = client.getArtistTopTracks(id);
-			const topTrack = response.body;
-			songObjects.push(...topTracks.tracks);
-		}
-
-		for(const song of songObjects) {
+		const songToDatabase = (song) => {
 			songsToInsert.push({
 				...baseObject,
 				name: song.name,
@@ -126,6 +111,24 @@ router.put("/add/:groupId/", async (req, res) => {
 			})
 		}
 
+		if(type === "song") {
+			const response = await client.getTrack(id);
+			const song = response.body;
+			songToDatabase(song);
+		} else if(type === "playlist") {
+			const response = await client.getPlaylist(id);
+			const playlist = response.body;
+
+			for(const song of playlist.tracks.items) {
+				songToDatabase(song.track)
+			}
+		} else if(type === "artist") {
+			const response = await client.getArtistTopTracks(id, "SE");
+			const topTracks = response.body;
+			for(const song of topTracks.tracks) {
+				songToDatabase(song);
+			}
+		}
 	}
 
 	await database.QueuedSong.bulkCreate(songsToInsert);

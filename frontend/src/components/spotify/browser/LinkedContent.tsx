@@ -11,6 +11,7 @@ import AlbumIcon from "@material-ui/icons/Album";
 import SwipeView from "react-swipeable-views";
 import SearchIcon from "@material-ui/icons/Search"
 import { observer } from "mobx-react";
+import Queue from "../../Queue";
 
 const styles = createStyles({
 	linkedContent: {
@@ -81,7 +82,7 @@ class LinkedContent extends Component<WithStyles<typeof styles> & IProps> {
 						subtitle: track.artists[0].name,
 						albumArtUrl: getArtwork(track.album.images),
 						onClick: () => {
-							controller.onQueue(track.id, QueueItemType.SONG)
+							controller.onQueue(track.id, QueueItemType.SONG);
 						}
 					})
 				}
@@ -91,7 +92,10 @@ class LinkedContent extends Component<WithStyles<typeof styles> & IProps> {
 						id: playlist.id,
 						title: playlist.name,
 						subtitle: `${playlist.tracks.total} songs`,
-						albumArtUrl: getArtwork(playlist.images)
+						albumArtUrl: getArtwork(playlist.images),
+						onClick: () => {
+							controller.onQueue(playlist.id, QueueItemType.PLAYLIST);
+						}
 					})
 				}
 			} else if(page === SearchPage.ARTISTS) {
@@ -100,7 +104,10 @@ class LinkedContent extends Component<WithStyles<typeof styles> & IProps> {
 						id: artist.id,
 						title: artist.name,
 						subtitle: `${artist.followers.total} followers`,
-						albumArtUrl: getArtwork(artist.images)
+						albumArtUrl: getArtwork(artist.images),
+						onClick: () => {
+							controller.onQueue(artist.id, QueueItemType.ARTIST);
+						}
 					})
 				}
 			} else if(page === SearchPage.ALBUMS) {
@@ -109,7 +116,10 @@ class LinkedContent extends Component<WithStyles<typeof styles> & IProps> {
 						id: album.id,
 						title: album.name,
 						subtitle: album.release_date,
-						albumArtUrl: getArtwork(album.images)
+						albumArtUrl: getArtwork(album.images),
+						onClick: () => {
+							controller.onQueue(album.id, QueueItemType.ALBUM);
+						}
 					})
 				}
 			}
@@ -121,7 +131,7 @@ class LinkedContent extends Component<WithStyles<typeof styles> & IProps> {
 
 		const listItems = results.map((result) => {
 			return (
-				<ListItem className={classes.resultListItem} 
+				<ListItem className={classes.resultListItem}
 					onClick={result.onClick}
 					key={result.id}
 					selected={false}
@@ -137,7 +147,7 @@ class LinkedContent extends Component<WithStyles<typeof styles> & IProps> {
 			progress = (
 				<LinearProgress className={classes.progress} />
 			)
-		} 
+		}
 
 		return (
 			<div className={classes.linkedContent}>
@@ -145,7 +155,7 @@ class LinkedContent extends Component<WithStyles<typeof styles> & IProps> {
 					variant="outlined"
 					value={controller.searchQuery}
 					onChange={event => controller.onSearch(event.target.value)}
-					type="search" 
+					type="search"
 					className={classes.spotifySearch}/>
 
 				<SwipeView>
@@ -154,24 +164,24 @@ class LinkedContent extends Component<WithStyles<typeof styles> & IProps> {
 					</List>
 				</SwipeView>
 
-				<BottomNavigation showLabels={true} 
-					onChange={onNav} 
+				<BottomNavigation showLabels={true}
+					onChange={onNav}
 					value={controller.selectedNavigation}>
 
 					<BottomNavigationAction label="Songs"
 						icon={<MusicNoteIcon />}
 						value={SearchPage.SONGS}/>
 
-					<BottomNavigationAction label="Playlists" 
-						icon={<ViewListIcon />} 
+					<BottomNavigationAction label="Playlists"
+						icon={<ViewListIcon />}
 						value={SearchPage.PLAYLISTS}/>
 
 					<BottomNavigationAction label="Artists"
 						icon={<AccountCircleIcon />}
 						value={SearchPage.ARTISTS}/>
 
-					<BottomNavigationAction label="Albums" 
-						icon={<AlbumIcon />} 
+					<BottomNavigationAction label="Albums"
+						icon={<AlbumIcon />}
 						value={SearchPage.ALBUMS}/>
 				</BottomNavigation>
 				{progress}
