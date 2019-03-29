@@ -36,7 +36,8 @@ router.get("/list/:groupId", async (req, res) => {
 		},
 		order: [
 			["priority", "DESC"]
-		]
+		],
+		limit: MAX_QUEUE_RETURN
 	});
 
 	return res.status(200).send(songs);
@@ -51,12 +52,6 @@ function getAlbumArtUrl(images) {
 	}
 
 	return null;
-}
-
-function songsToDatabase(base, songs) {
-
-	const dbObjects = [];
-
 }
 
 router.put("/add/:groupId/", async (req, res) => {

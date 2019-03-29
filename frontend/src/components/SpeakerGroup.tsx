@@ -19,7 +19,6 @@ const styles = (theme: Theme) => createStyles({
 });
 
 interface IProps {
-	groupName: string
 	speakerNames: string[]
 }
 
@@ -28,18 +27,37 @@ class SpeakerGroup extends Component<WithStyles<typeof styles> & IProps> {
 	public render() : ReactNode {
 		const classes = this.props.classes;
 
-		const speakers = this.props.speakerNames.map((name, index) => {
-			return (
-				<ListItem key={index} className={classes.nested}>
-					<ListItemIcon>
-						<SpeakerIcon />
-					</ListItemIcon>
-					<Typography noWrap={true} className={classes.text} >
-						{name}
-					</Typography>
-				</ListItem>
+
+
+		let groupName = "";
+		const speakerNames = this.props.speakerNames;
+		if(speakerNames.length === 1) {
+			groupName = speakerNames[0];
+		} else if(speakerNames.length > 1) {
+			groupName = `${speakerNames[0]} + ${speakerNames.length - 1} more`
+		}
+
+		let subSpeakers = null;
+		if(speakerNames.length > 1) {
+			const speakers = this.props.speakerNames.map((name, index) => {
+				return (
+					<ListItem key={index} className={classes.nested}>
+						<ListItemIcon>
+							<SpeakerIcon />
+						</ListItemIcon>
+						<Typography noWrap={true} className={classes.text} >
+							{name}
+						</Typography>
+					</ListItem>
+				)
+			});
+
+			subSpeakers = (
+				<List disablePadding={true}>
+					{speakers}
+				</List>
 			)
-		});
+		}
 
 		return (
 			<List className={classes.container}>
@@ -48,12 +66,10 @@ class SpeakerGroup extends Component<WithStyles<typeof styles> & IProps> {
 						<SpeakerGroupIcon />
 					</ListItemIcon>
 					<Typography className={classes.text}>
-						{this.props.groupName}
+						{groupName}
 					</Typography>
 				</ListItem>
-				<List disablePadding={true}>
-					{speakers}
-				</List>
+				{subSpeakers}
 			</List>
 		)
 	}

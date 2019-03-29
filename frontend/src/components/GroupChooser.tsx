@@ -4,6 +4,7 @@ import { ISpeakerGroup } from "../interfaces/services/InfoService";
 import SpeakerGroup from "./SpeakerGroup";
 import Section from "./Section";
 import { IGroupChooserController } from "../interfaces/controllers/GroupChooserController";
+import { observer } from "mobx-react";
 
 const styles = createStyles({
 	heading: {
@@ -24,6 +25,7 @@ interface IProps {
 	controller: IGroupChooserController
 }
 
+@observer
 class GroupChooser extends Component<WithStyles<typeof styles> & IProps> {
 
 	public render() : ReactNode {
@@ -39,13 +41,13 @@ class GroupChooser extends Component<WithStyles<typeof styles> & IProps> {
 			};
 
 			return (
-				<ListItem onClick={onClick} 
-					disableGutters={true} 
+				<ListItem onClick={onClick}
+					disableGutters={true}
 					key={group.id}
 					selected={controller.selectedId === group.id}
 					className={classes.speakerGroup}>
 
-					<SpeakerGroup groupName={"Group " + index} speakerNames={names} />
+					<SpeakerGroup speakerNames={names} />
 				</ListItem>
 			)
 		});

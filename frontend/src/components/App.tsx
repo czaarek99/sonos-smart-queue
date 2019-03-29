@@ -41,10 +41,18 @@ interface IProps {}
 class App extends Component<IProps & WithStyles<typeof styles>> {
 
 	@observable private readonly controller: AppController;
+	@observable private smartQueueController: SmartQueueController;
+	@observable private controlController: ControlController;
+	@observable private groupChooserController: GroupChooserController;
+	@observable private spotifyBrowserController: SpotifyBrowserController;
 
 	constructor(props) {
 		super(props);
 		this.controller = new AppController();
+		this.smartQueueController = new SmartQueueController(this.controller);
+		this.controlController = new ControlController();
+		this.groupChooserController = new GroupChooserController(this.controller);
+		this.spotifyBrowserController = new SpotifyBrowserController(this.controller);
 	}
 
 	render() : ReactNode {
@@ -52,10 +60,10 @@ class App extends Component<IProps & WithStyles<typeof styles>> {
 
 		if(this.controller.loggedIn) {
 			content = (
-				<SmartQueue controller={new SmartQueueController(this.controller)} 
-					controlController={new ControlController()}
-					groupChooserController={new GroupChooserController(this.controller)}
-					browserController={new SpotifyBrowserController(this.controller)}/>
+				<SmartQueue controller={this.smartQueueController}
+					controlController={this.controlController}
+					groupChooserController={this.groupChooserController}
+					browserController={this.spotifyBrowserController}/>
 			)
 		} else {
 			content = <Login controller={new LoginController(this.controller)}/>;

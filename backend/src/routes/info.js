@@ -4,7 +4,7 @@ const util = require("util");
 
 //Application has to cache this
 router.get("/groups", async (req, res) => {
-	/*const grouped = await client.getGroupedClients();
+	const grouped = await client.getGroupedClients();
 	const response = [];
 
 	for(const [id, info] of grouped) {
@@ -14,18 +14,18 @@ router.get("/groups", async (req, res) => {
 		})
 	}
 
-	res.status(200).send(response);*/
-	res.status(200).send([
+	res.status(200).send(response);
+	/*res.status(200).send([
 		{
-			id: "0",
+			id: "test",
 			speakers: [
 				{
 					name: "A speaker in a group",
-					id: "1"
+					id: "fake speaker"
 				}
 			]
 		}
-	]);
+	]);*/
 });
 
 

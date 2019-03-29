@@ -5,7 +5,7 @@ import { ISpeakerGroup } from "../interfaces/services/InfoService";
 
 export class GroupChooserController implements IGroupChooserController {
 
-	private readonly appController: AppController;
+	@observable private readonly appController: AppController;
 	@observable public groups: ISpeakerGroup[] = [];
 	@observable public loading = true;
 
@@ -21,10 +21,12 @@ export class GroupChooserController implements IGroupChooserController {
 	private async load() : Promise<void> {
 		await this.refreshGroups();
 		this.loading = false;
-		
+
 		window.setInterval(async () => {
 			await this.refreshGroups();
 		}, 15 * 1000)
+
+		this.appController.setGroupId(this.groups[0].id);
 	}
 
 	private async refreshGroups() : Promise<void> {

@@ -25,7 +25,7 @@ export class AppController {
 
 	private services: IServices;
 	private accessToken: string;
-	private groupId = "test";
+	@observable private groupId = "test";
 	@observable private queueItems: IQueuedSong[] = [];
 	@observable private globalStorage = new KeyStore<IGlobalData>(localStorage, "global");
 	@observable public loggedIn = false;
