@@ -29,6 +29,7 @@ export class AppController {
 
 	private services: IServices;
 	private accessToken: string;
+	private firstGroup = true;
 	@observable private groupId = null;
 	@observable private queueItems: ISong[] = [];
 	@observable private currentlyPlaying: ISong = null;
@@ -105,6 +106,11 @@ export class AppController {
 				await this.services.authenticationService.verifyToken();
 
 				this.services.infoService.setGroupUpdateCallback((groups: ISpeakerGroup[]) => {
+					if(this.firstGroup) {
+						this.firstGroup = false;
+						this.setGroupId(groups[0].id);
+					}
+
 					this.speakerGroups = groups;
 				});
 			} catch(error) {
