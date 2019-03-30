@@ -1,9 +1,11 @@
 const database = require("../database");
+const { sendQueueToHub } = require("../util/queue");
 
 class Scheduler {
 
-	constructor(client) {
+	constructor(client, hub) {
 		this.client = client;
+		this.hub = hub;
 	}
 
 	spotifyUriToSonosUri(uri) {
@@ -58,7 +60,7 @@ class Scheduler {
 			const sonosUri = this.spotifyUriToSonosUri(nextSong.spotifyId);
 
 			await this.client.playSong(sonosUri, () => {
-				this.onSongFinishPlaying(song.id);
+				this.onSongFinishPlaying(nextSong.id);
 			});
 
 			await database.QueuedSong.update({
@@ -68,6 +70,9 @@ class Scheduler {
 					id: nextSong.id,
 				}
 			});
+
+			console.log("Sending again!");
+			await sendQueueToHub(this.hub);
 		} 
 
 		this.playTimeout = setTimeout(() => {

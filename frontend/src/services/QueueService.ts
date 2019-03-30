@@ -5,7 +5,6 @@ export class QueueService extends BaseService implements IQueueService {
 
 	private readonly queueEvents: EventSource;
 	private queueCallback: QueueCallback;
-	private readonly queuedSongs: IQueuedSongsMap = {};
 
 	constructor(accessToken: string, headers?: object) {
 		super(accessToken, headers);
@@ -13,16 +12,11 @@ export class QueueService extends BaseService implements IQueueService {
 		const params = new URLSearchParams();
 		params.set("authorization", accessToken);
 
-		const eventUrl = "/queue/list?" + params.toString();
-		console.log(eventUrl);
+		const eventUrl = "http://localhost:5000/queue/list?" + params.toString();
 		this.queueEvents = new EventSource(eventUrl);
 
-		this.queueEvents.onmessage = () => {
-			console.log("message");
-		}
-
 		this.queueEvents.addEventListener("updateQueue", (event: MessageEvent) => {
-			console.log(event.data);
+			this.queueCallback(JSON.parse(event.data));
 		})
 	}
 

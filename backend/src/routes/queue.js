@@ -3,52 +3,15 @@ const database = require("../database");
 const { throwIfNotSonosGroupId, throwIfNotStringOrEmpty } = require("../util/validation");
 const { getBaseClient } = require("../spotify/client");
 const { accessTokenMiddleware, refreshTokenMiddleware } = require("../middlewares/token");
-const { sse, sseHub, Hub } = require("@toverux/expresse");
-const MAX_QUEUE_RETURN = 50;
+const { sseHub } = require("@toverux/expresse");
+const { getQueue, sendQueueToHub } = require("../util/queue");
 
-const queueHub = new Hub();
+router.get("/list", async (req, res, next) => {
+	const sseMiddleware = sseHub({ flushAfterWrite: true, hub: res.locals.hubs.queue });
+	sseMiddleware(req, res, () => {});
 
-async function getQueue() {
-	const songs = await database.QueuedSong.findAll({
-		attributes: [
-			"name",
-			"albumName",
-			"albumArtUrl",
-			"artistName",
-			"groupId"
-		],
-		where: {
-			state: database.SONG_STATE.QUEUED,
-		},
-		order: [
-			["priority", "DESC"]
-		],
-		limit: MAX_QUEUE_RETURN
-	});
-
-	const queue = {};
-	for(const song of songs) {
-		const strippedSong = {
-			name: song.name,
-			albumName: song.albumName,
-			albumArtUrl: song.albumArtUrl,
-			artistName: song.artistName
-		};
-
-		const groupId = song.groupId;
-		if(groupId in queue) {
-			queue[groupId].push(strippedSong)
-		} else {
-			queue[groupId] = [strippedSong];
-		}
-	}
-
-	return queue;
-}
-
-router.get("/list", sseHub({ flushAfterWrite: true, hub: queueHub }), (req, res) => {
-	console.log("Broadcast!");
-	res.sse.broadcast.event("message", "bro");
+	const queue = await getQueue();
+	res.sse.broadcast.event("updateQueue", queue);
 });
 
 router.use(accessTokenMiddleware);
@@ -134,9 +97,7 @@ router.put("/add/:groupId/", async (req, res) => {
 	}
 
 	await database.QueuedSong.bulkCreate(songsToInsert);
-
-	const queue = await getQueue();
-	queueHub.event("updateQueue", queue);
+	await sendQueueToHub(res.locals.hubs.queue);
 
 	res.status(200).send();
 });

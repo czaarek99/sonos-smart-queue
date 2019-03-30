@@ -1,7 +1,7 @@
 import { KeyStore } from "../storage/KeyStore";
 import { observable, computed } from "mobx";
 import { IAuthenticationService } from "../interfaces/services/AuthenticationService";
-import { IQueueService, IQueuedSong } from "../interfaces/services/QueueService";
+import { IQueueService, IQueuedSong, IQueuedSongsMap } from "../interfaces/services/QueueService";
 import { IInfoService } from "../interfaces/services/InfoService";
 import { ISpotifyService } from "../interfaces/services/SpotifyService";
 import { AuthenticationService } from "../services/AuthenticationService";
@@ -26,7 +26,7 @@ export class AppController {
 	private services: IServices;
 	private accessToken: string;
 	@observable private groupId = null;
-	@observable private queueItems: IQueuedSong[] = [];
+	@observable private queueMap: IQueuedSongsMap = {};
 	@observable private globalStorage = new KeyStore<IGlobalData>(localStorage, "global");
 	@observable public loggedIn = false;
 
@@ -47,6 +47,18 @@ export class AppController {
 			queueService: new QueueService(this.accessToken),
 			infoService: new InfoService(this.accessToken),
 			spotifyService: new SpotifyService(this.accessToken)
+		}
+
+		this.services.queueService.addQueueCallbackService((queueMap: IQueuedSongsMap) => {
+			this.queueMap = queueMap;
+		})
+	}
+
+	@computed get queueItems() {
+		if(this.groupId !== null && this.groupId in this.queueMap) {
+			return this.queueMap[this.groupId];
+		} else {
+			return [];
 		}
 	}
 

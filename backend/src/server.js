@@ -7,6 +7,8 @@ const app = express();
 const SonosNetwork = require("./sonos/SonosNetwork");
 const SonosScheduler = require("./sonos/SonosScheduler");
 const SonosClient = require("./sonos/SonosClient");
+const { Hub } = require("@toverux/expresse");
+const { isProduction } = require("./config");
 
 (async function() {
 	await database.sequelize.sync({
@@ -21,6 +23,10 @@ const SonosClient = require("./sonos/SonosClient");
 		}
 	});
 
+	const hubs = {
+		queue: new Hub()
+	}
+
 	const sonosNetwork = new SonosNetwork();
 	const schedulers = new Map();
 
@@ -28,7 +34,7 @@ const SonosClient = require("./sonos/SonosClient");
 		const coordinator = sonosNetwork.getCoordinatorForGroup(groupId);
 
 		const client = new SonosClient(coordinator, groupId);
-		const scheduler = new SonosScheduler(client); 
+		const scheduler = new SonosScheduler(client, hubs.queue); 
 		scheduler.start();
 		schedulers.set(groupId, scheduler);
 	});
@@ -39,12 +45,21 @@ const SonosClient = require("./sonos/SonosClient");
 			scheduler.stop();
 			schedulers.delete(groupId);
 		}
-	})
+	});
 
 	await sonosNetwork.init();
 
+	if(!isProduction) {
+		app.use((req, res, next) => {
+			res.setHeader("Access-Control-Allow-Origin", "*");
+			next();
+		})
+	}
+
 	app.use((req, res, next) => {
 		res.locals.sonosNetwork = sonosNetwork;
+		res.locals.hubs = hubs,
+
 		next();
 	});
 
@@ -53,12 +68,8 @@ const SonosClient = require("./sonos/SonosClient");
 	app.use(bodyParser.urlencoded({
 		extended: true
 	}));
-	app.use(bodyParser.json());
 
-	app.get("/test", (req, res) => {
-		res.write("test");
-		res.end();
-	});
+	app.use(bodyParser.json());
 
 	app.use("/account", require("./routes/account"));
 	app.use("/spotify", require("./routes/spotify"));

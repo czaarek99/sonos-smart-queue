@@ -37,12 +37,12 @@ class SonosClient {
 	}
 
 	async playSong(songUri, onFinish) {
-		/*await this.coordinator.flush();
+		await this.coordinator.flush();
 		await this.coordinator.play(songUri);
 
 		this.coordinator.once("PlaybackStopped", () => {
 			onFinish();
-		});*/
+		});
 	}
 
 	getGroupId() {
