@@ -35,7 +35,6 @@ const styles = createStyles({
 		position: "relative"
 	},
 	resultList: {
-		overflow: "scroll",
 	},
 	progress: {
 		height: "6px",

@@ -78,9 +78,7 @@ export class AppController {
 	}
 
 	public async refreshQueue() : Promise<void> {
-		if(this.groupId !== null) {
-			this.queueItems = await this.services.queueService.getQueue(this.groupId);
-		}
+
 	}
 
 	private async load() : Promise<void> {

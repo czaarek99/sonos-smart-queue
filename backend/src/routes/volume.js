@@ -1,18 +1,21 @@
 const router = require("express-promise-router")();
-const { throwIfNotSonosGroupId } = require("../util/validation");
-const SonosClient = require("../client");
+const { throwIfNotSonosGroupId, throwIfNaN } = require("../util/validation");
+const SonosClient = require("../sonos/SonosClient");
 const APIError = require("../util/APIError");
 
 router.get("/:groupId", async (req, res) => {
 	const groupId = req.params.groupId;
 	throwIfNotSonosGroupId(groupId);
-	const coordinator = SonosClient.getCoordinatorByGroupId(groupId);
 
-	if(coordinator === null) {
-		throw new APIError(404, "No such groupid");
+	let volume;
+
+	try {
+		const coordinator = res.locals.sonosNetwork.getCoordinatorForGroup(groupId);
+		const client = new SonosClient(coordinator, groupId);
+		volume = await client.getVolume();
+	} catch(error) {
+		throw new APIError(404, "No group with this id")
 	}
-
-	const volume = await coordinator.getVolume();
 
 	res.status(200).send({
 		volume
@@ -20,8 +23,20 @@ router.get("/:groupId", async (req, res) => {
 });
 
 router.patch("/:groupId", async (req, res) => {
-	res.status(501).send();
-	//TODO: https://github.com/bencevans/node-sonos/issues/373
+	const groupId = req.params.groupId;
+	throwIfNotSonosGroupId(groupId);
+	const newVolume = req.body.volume;
+	throwIfNaN("volume", newVolume);
+
+	try {
+		const coordinator = res.locals.sonosNetwork.getCoordinatorForGroup(groupId);
+		const client = new SonosClient(coordinator, groupId);
+		await client.setVolume(newVolume)
+	} catch(error) {
+		throw new APIError(404, "No group with this id")
+	}
+
+	res.status(200).send();
 });
 
 module.exports = router;

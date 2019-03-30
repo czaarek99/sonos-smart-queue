@@ -18,9 +18,9 @@ export class ControlController implements IControlController {
 	private async load() {
 		this.updatePlaying();
 
-		setInterval(() => {
+		/*setInterval(() => {
 			this.updatePlaying();
-		}, 1000)
+		}, 1000)*/
 	}
 
 	private async updatePlaying() {

@@ -11,7 +11,13 @@ export enum QueueItemType {
 	ARTIST = "artist"
 } 
 
+export interface IQueuedSongsMap {
+	[key: string]: IQueuedSong[]
+}
+
+export type QueueCallback = (songMap: IQueuedSongsMap) => void
+
 export interface IQueueService {
-	getQueue: (groupId: string) => Promise<IQueuedSong[]>
+	addQueueCallbackService: (callback: QueueCallback) => void
 	addToQueue: (spotifyToken: string, groupId: string, id: string, type: QueueItemType) => Promise<void>
 }

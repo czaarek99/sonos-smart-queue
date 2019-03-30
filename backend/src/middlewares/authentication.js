@@ -1,7 +1,7 @@
 const database = require("../database");
 
 module.exports = async function(req, res, next) {
-	const accessToken = req.headers.authorization;
+	const accessToken = req.headers.authorization || req.query.authorization;
 
 	if(accessToken) {
 		const token = await database.AccessToken.findOne({

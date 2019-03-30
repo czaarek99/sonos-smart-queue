@@ -1,22 +1,10 @@
 const router = require("express-promise-router")();
 const { throwIfNotSonosGroupId } = require("../util/validation");
-const SonosClient = require("../client");
 const database = require("../database");
-const ApiError = require("../util/APIError");
-const util = require("util");
 
 router.get("/groups", async (req, res) => {
-	const groups = SonosClient.getSpeakerGroups();
-	const response = [];
-
-	for(const [id, device] of groups) {
-		response.push({
-			id,
-			speakers: device.members
-		})
-	}
-
-	res.status(200).send(response);
+	const groups = res.locals.sonosNetwork.getGroupInfo();
+	res.status(200).send(groups);
 });
 
 router.get("/playing/:groupId", async (req, res) => {

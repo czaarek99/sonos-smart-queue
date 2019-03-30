@@ -4,15 +4,49 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const database = require("./database");
 const app = express();
-const SonosClient = require("./client");
-const { spotifyUriToSonosUri } = require("./util/router");
+const SonosNetwork = require("./sonos/SonosNetwork");
+const SonosScheduler = require("./sonos/SonosScheduler");
+const SonosClient = require("./sonos/SonosClient");
 
 (async function() {
-	await SonosClient.initialize();
-
 	await database.sequelize.sync({
 		force: false
+	});
+
+	await database.QueuedSong.update({
+		state: database.SONG_STATE.FINISHED
+	}, {
+		where: {
+			state: database.SONG_STATE.PLAYING
+		}
+	});
+
+	const sonosNetwork = new SonosNetwork();
+	const schedulers = new Map();
+
+	sonosNetwork.addListener("groupCreate", (groupId) => {
+		const coordinator = sonosNetwork.getCoordinatorForGroup(groupId);
+
+		const client = new SonosClient(coordinator, groupId);
+		const scheduler = new SonosScheduler(client); 
+		scheduler.start();
+		schedulers.set(groupId, scheduler);
+	});
+
+	sonosNetwork.addListener("groupDestroy", (groupId) => {
+		if(schedulers.has(groupId)) {
+			const scheduler = schedulers.get(groupId);
+			scheduler.stop();
+			schedulers.delete(groupId);
+		}
 	})
+
+	await sonosNetwork.init();
+
+	app.use((req, res, next) => {
+		res.locals.sonosNetwork = sonosNetwork;
+		next();
+	});
 
 	app.use(cookieParser());
 
@@ -20,6 +54,11 @@ const { spotifyUriToSonosUri } = require("./util/router");
 		extended: true
 	}));
 	app.use(bodyParser.json());
+
+	app.get("/test", (req, res) => {
+		res.write("test");
+		res.end();
+	});
 
 	app.use("/account", require("./routes/account"));
 	app.use("/spotify", require("./routes/spotify"));
@@ -45,51 +84,7 @@ const { spotifyUriToSonosUri } = require("./util/router");
 		}
 	})
 
-	await database.QueuedSong.update({
-		state: database.SONG_STATE.FINISHED
-	}, {
-		where: {
-			state: database.SONG_STATE.PLAYING
-		}
-	});
 
 	app.listen(5000);
-
-	console.log(SonosClient.getSpeakerGroups());
-
-	for(const groupId of SonosClient.getSpeakerGroups().keys()) {
-		playOnGroup(groupId)
-	}
 })();
 
-async function playOnGroup(groupId) {
-	console.log("play on group");
-	const song = await database.QueuedSong.findOne({
-		where: {
-			groupId: groupId,
-			state: database.SONG_STATE.QUEUED
-		},
-		order: [
-			["priority", "DESC"]
-		],
-	});
-
-	if(song === null) {
-		console.log("no song")
-		setTimeout(playOnGroup, 500);
-	} else {
-		console.log("found song")
-		await SonosClient.playSong(groupId, spotifyUriToSonosUri(song.spotifyId), () => {
-			console.log("IMMEDIATE!")
-			setImmediate(playOnGroup);
-		});
-
-		await database.QueuedSong.update({
-			state: database.SONG_STATE.PLAYING
-		}, {
-			where: {
-				id: song.id,
-			}
-		})
-	}
-}
