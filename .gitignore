@@ -8,5 +8,6 @@ package-lock.json
 
 ngrok*
 start.sh
+start.bat
 
 *.vim
