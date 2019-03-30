@@ -192,6 +192,21 @@ class SonosClient {
 		}
 	}
 
+	async sendVolumeUpdateEvent(useHub, callback) {
+		const eventName = "updateVolume";
+		const volume = await this.getVolume();
+
+		const volumeObj = {
+			volume
+		}
+
+		if(useHub) {
+			this.controlHub.event(eventName, volumeObj)
+		} else {
+			callback(eventName, volumeObj);
+		}
+	}
+
 	async playNext() {
 		const nextSong = await database.QueuedSong.findOne({
 			where: {
