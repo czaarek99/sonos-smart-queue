@@ -10,7 +10,8 @@ export interface ISpeakerGroup {
 	speakers: ISpeaker[]
 }
 
+export type SpeakersCallback = (speakerGroups: ISpeakerGroup[]) => void
+
 export interface IInfoService {
-	getGroups: () => Promise<ISpeakerGroup[]>
-	getCurrentlyPlaying: (groupId: string) => Promise<ISong>
+	setGroupUpdateCallback: (callback: SpeakersCallback) => void
 }

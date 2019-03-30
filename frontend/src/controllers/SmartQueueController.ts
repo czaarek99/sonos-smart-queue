@@ -1,8 +1,8 @@
 import { ISmartQueueController } from "../interfaces/controllers/SmartQueueController";
 import { observable, computed } from "mobx";
-import { IQueuedSong } from "../interfaces/services/QueueService";
 import { ISpeakerGroup } from "../interfaces/services/InfoService";
 import { AppController } from "./AppController";
+import { ISong } from "../interfaces/Song";
 
 export class SmartQueueController implements ISmartQueueController {
 
@@ -11,23 +11,13 @@ export class SmartQueueController implements ISmartQueueController {
 
 	constructor(appController: AppController) {
 		this.appController = appController;
-		this.load();
 	}
 
 	@computed get groupId() : string {
 		return this.appController.getGroupId();
 	}
 
-	@computed get queueItems() : IQueuedSong[] {
+	@computed get queueItems() : ISong[] {
 		return this.appController.getQueue();
 	}
-
-	private async load() : Promise<void> {
-		await this.refreshQueue();
-	}
-
-	public async refreshQueue() : Promise<void> {
-		this.appController.refreshQueue();
-	}
-	
 }

@@ -59,7 +59,7 @@ class GroupChooser extends Component<WithStyles<typeof styles> & IProps> {
 		});
 
 		return (
-			<Section header="Group Selection" loading={controller.loading}>
+			<Section header="Group Selection">
 				<List disablePadding={true} className={classes.list}>
 					{groups}
 				</List>

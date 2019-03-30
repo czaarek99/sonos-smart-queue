@@ -1,10 +1,8 @@
-import { IQueuedSong } from "../services/QueueService";
 import { ISpeakerGroup } from "../services/InfoService";
+import { ISong } from "../Song";
 
 export interface ISmartQueueController {
-	readonly queueItems: IQueuedSong[]
+	readonly queueItems: ISong[]
 	readonly loading: boolean;
 	readonly groupId: string;
-
-	refreshQueue: () => Promise<void>
 }

@@ -1,27 +1,16 @@
-import { IQueueService, IQueuedSong, QueueItemType, QueueCallback, IQueuedSongsMap } from "../interfaces/services/QueueService";
+import { IQueueService, QueueItemType, QueueCallback } from "../interfaces/services/QueueService";
 import { BaseService } from "./BaseService";
 
 export class QueueService extends BaseService implements IQueueService {
 
-	private readonly queueEvents: EventSource;
-	private queueCallback: QueueCallback;
+	public setQueueUpdateCallback(groupId: string, callback: QueueCallback) : void {
+		const eventUrl = `http://localhost:5000/queue/list/${groupId}`;
+		this.destroyEventSource(eventUrl);
 
-	constructor(accessToken: string, headers?: object) {
-		super(accessToken, headers);
-
-		const params = new URLSearchParams();
-		params.set("authorization", accessToken);
-
-		const eventUrl = "http://localhost:5000/queue/list?" + params.toString();
-		this.queueEvents = new EventSource(eventUrl);
-
-		this.queueEvents.addEventListener("updateQueue", (event: MessageEvent) => {
-			this.queueCallback(JSON.parse(event.data));
-		})
-	}
-
-	addQueueCallbackService(callback: QueueCallback) {
-		this.queueCallback = callback;
+		this.setUpdateCallbacks(eventUrl, {
+			eventName: "updateQueue",
+			callback
+		});
 	}
 
 	public async addToQueue(spotifyToken: string, groupId: string, id: string, type: QueueItemType) : Promise<void> {

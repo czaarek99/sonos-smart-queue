@@ -1,12 +1,12 @@
 import React, { Component, ReactNode } from "react";
 import { createStyles, WithStyles, withStyles, ListItem, List, Typography, Paper } from "@material-ui/core";
-import { IQueuedSong } from "../interfaces/services/QueueService";
 import PlaybackItem from "./spotify/PlaybackItem";
 import Heading from "./Heading";
 import Section from "./Section";
+import { ISong } from "../interfaces/Song";
 
 interface IProps {
-	queued: IQueuedSong[]
+	queued: ISong[]
 }
 
 const styles = createStyles({

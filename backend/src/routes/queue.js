@@ -1,103 +1,46 @@
 const router = require("express-promise-router")();
-const database = require("../database");
 const { throwIfNotSonosGroupId, throwIfNotStringOrEmpty } = require("../util/validation");
 const { getBaseClient } = require("../spotify/client");
 const { accessTokenMiddleware, refreshTokenMiddleware } = require("../middlewares/token");
 const { sseHub } = require("@toverux/expresse");
-const { getQueue, sendQueueToHub } = require("../util/queue");
 
-router.get("/list", async (req, res, next) => {
-	const sseMiddleware = sseHub({ flushAfterWrite: true, hub: res.locals.hubs.queue });
+router.get("/list/:groupId", async (req, res, next) => {
+	const groupId = req.params.groupId;
+	throwIfNotSonosGroupId(groupId);
+
+	if(!res.locals.clients.has(groupId)) {
+		throw new APIError(404, "No group with this id")
+	} 
+
+	const client = res.locals.clients.get(groupId);
+
+	const sseMiddleware = sseHub({ flushAfterWrite: true, hub: client.getQueueHub() });
 	sseMiddleware(req, res, () => {});
-
-	const queue = await getQueue();
-	res.sse.broadcast.event("updateQueue", queue);
+	await client.sendQueueUpdateEvent(false, res.sse.event);
 });
 
 router.use(accessTokenMiddleware);
 router.use(refreshTokenMiddleware);
 
-function getAlbumArtUrl(images) {
-	if(images.length > 0) {
-		return images[0].url;
-	}
-
-	return null;
-}
-
 router.put("/add/:groupId/", async (req, res) => {
 	const groupId = req.params.groupId;
 	throwIfNotSonosGroupId(groupId);
-	const id = req.body.id;
-	throwIfNotStringOrEmpty("id", id);
+	const songId = req.body.id;
+	throwIfNotStringOrEmpty("id", songId);
 	const type = req.body.type;
 	throwIfNotStringOrEmpty("type", type);
 
-	const client = getBaseClient({
+	if(!res.locals.clients.has(groupId)) {
+		throw new APIError(404, "No group with this id")
+	}
+
+	const spotifyClient = getBaseClient({
 		refreshToken: res.locals.spotifyRefreshToken,
 		accessToken: res.locals.spotifyAccessToken
 	});
 
-	//TODO: Handle priority
-	const priority = 100;
-
-	const baseObject = {
-		state: database.SONG_STATE.QUEUED,
-		groupId,
-		priority,
-	}
-
-	const songsToInsert = [];
-	if(type === "album") {
-		const response = await client.getAlbum(id);
-		const album = response.body;
-		console.log("test");
-		for(const song of album.tracks.items) {
-			const albumArtUrl = getAlbumArtUrl(album.images);
-
-			songsToInsert.push({
-				...baseObject,
-				name: song.name,
-				artistName: album.artists[0].name,
-				albumName: album.name,
-				spotifyId: song.id,
-				albumArtUrl
-			})
-		}
-	} else {
-		const songToDatabase = (song) => {
-			songsToInsert.push({
-				...baseObject,
-				name: song.name,
-				artistName: song.artists[0].name,
-				albumName: song.album.name,
-				spotifyId: song.id,
-				albumArtUrl: getAlbumArtUrl(song.album.images)
-			})
-		}
-
-		if(type === "song") {
-			const response = await client.getTrack(id);
-			const song = response.body;
-			songToDatabase(song);
-		} else if(type === "playlist") {
-			const response = await client.getPlaylist(id);
-			const playlist = response.body;
-
-			for(const song of playlist.tracks.items) {
-				songToDatabase(song.track)
-			}
-		} else if(type === "artist") {
-			const response = await client.getArtistTopTracks(id, "SE");
-			const topTracks = response.body;
-			for(const song of topTracks.tracks) {
-				songToDatabase(song);
-			}
-		}
-	}
-
-	await database.QueuedSong.bulkCreate(songsToInsert);
-	await sendQueueToHub(res.locals.hubs.queue);
+	const client = res.locals.clients.get(groupId);
+	client.addToQueue(spotifyClient, type, songId)
 
 	res.status(200).send();
 });

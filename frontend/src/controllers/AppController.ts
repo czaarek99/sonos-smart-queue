@@ -1,14 +1,17 @@
 import { KeyStore } from "../storage/KeyStore";
 import { observable, computed } from "mobx";
 import { IAuthenticationService } from "../interfaces/services/AuthenticationService";
-import { IQueueService, IQueuedSong, IQueuedSongsMap } from "../interfaces/services/QueueService";
-import { IInfoService } from "../interfaces/services/InfoService";
+import { IQueueService } from "../interfaces/services/QueueService";
+import { IInfoService, ISpeakerGroup } from "../interfaces/services/InfoService";
 import { ISpotifyService } from "../interfaces/services/SpotifyService";
 import { AuthenticationService } from "../services/AuthenticationService";
 import { QueueService } from "../services/QueueService";
 import { InfoService } from "../services/InfoService";
 import { SpotifyService } from "../services/SpotifyService";
 import { SmartQueueController } from "./SmartQueueController";
+import { ISong } from "../interfaces/Song";
+import { ControlService } from "../services/ControlService";
+import { IControlService, IPlaying } from "../interfaces/services/ControlService";
 
 interface IGlobalData {
 	accessToken: string
@@ -19,6 +22,7 @@ export interface IServices {
 	queueService: IQueueService,
 	infoService: IInfoService,
 	spotifyService: ISpotifyService
+	controlService: IControlService
 }
 
 export class AppController {
@@ -26,7 +30,9 @@ export class AppController {
 	private services: IServices;
 	private accessToken: string;
 	@observable private groupId = null;
-	@observable private queueMap: IQueuedSongsMap = {};
+	@observable private queueItems: ISong[] = [];
+	@observable private currentlyPlaying: ISong = null;
+	@observable private speakerGroups: ISpeakerGroup[] = [];
 	@observable private globalStorage = new KeyStore<IGlobalData>(localStorage, "global");
 	@observable public loggedIn = false;
 
@@ -46,19 +52,8 @@ export class AppController {
 			authenticationService: new AuthenticationService(this.accessToken),
 			queueService: new QueueService(this.accessToken),
 			infoService: new InfoService(this.accessToken),
-			spotifyService: new SpotifyService(this.accessToken)
-		}
-
-		this.services.queueService.addQueueCallbackService((queueMap: IQueuedSongsMap) => {
-			this.queueMap = queueMap;
-		})
-	}
-
-	@computed get queueItems() {
-		if(this.groupId !== null && this.groupId in this.queueMap) {
-			return this.queueMap[this.groupId];
-		} else {
-			return [];
+			spotifyService: new SpotifyService(this.accessToken),
+			controlService: new ControlService(this.accessToken)
 		}
 	}
 
@@ -76,7 +71,7 @@ export class AppController {
 		};
 	}
 
-	public getQueue() : IQueuedSong[] {
+	public getQueue() : ISong[] {
 		return this.queueItems;
 	}
 
@@ -84,19 +79,34 @@ export class AppController {
 		return this.groupId;
 	}
 
-	public setGroupId(id: string) {
-		this.groupId = id;
-		this.refreshQueue();
+	public getGroups() : ISpeakerGroup[] {
+		return this.speakerGroups;
 	}
 
-	public async refreshQueue() : Promise<void> {
+	public getCurrentlyPlaying() {
+		return this.currentlyPlaying;
+	}
 
+	public setGroupId(id: string) {
+		this.groupId = id;
+
+		this.services.controlService.setPlayingUpdateCallback(id, (playing: IPlaying) => {
+			this.currentlyPlaying = playing.playing;
+		});
+
+		this.services.queueService.setQueueUpdateCallback(id, (songs: ISong[]) => {
+			this.queueItems = songs;
+		});
 	}
 
 	private async load() : Promise<void> {
 		if(this.loggedIn) {
 			try {
 				await this.services.authenticationService.verifyToken();
+
+				this.services.infoService.setGroupUpdateCallback((groups: ISpeakerGroup[]) => {
+					this.speakerGroups = groups;
+				});
 			} catch(error) {
 				this.loggedIn = false;
 			}

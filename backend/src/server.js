@@ -5,9 +5,7 @@ const cookieParser = require("cookie-parser");
 const database = require("./database");
 const app = express();
 const SonosNetwork = require("./sonos/SonosNetwork");
-const SonosScheduler = require("./sonos/SonosScheduler");
 const SonosClient = require("./sonos/SonosClient");
-const { Hub } = require("@toverux/expresse");
 const { isProduction } = require("./config");
 
 (async function() {
@@ -23,28 +21,24 @@ const { isProduction } = require("./config");
 		}
 	});
 
-	const hubs = {
-		queue: new Hub()
-	}
-
 	const sonosNetwork = new SonosNetwork();
-	const schedulers = new Map();
+	const clients = new Map();
+
+	sonosNetwork.addListener("groupChange", (groupId) => {
+		
+	})
 
 	sonosNetwork.addListener("groupCreate", (groupId) => {
 		const coordinator = sonosNetwork.getCoordinatorForGroup(groupId);
 
 		const client = new SonosClient(coordinator, groupId);
-		const scheduler = new SonosScheduler(client, hubs.queue); 
-		scheduler.start();
-		schedulers.set(groupId, scheduler);
+		client.start();
+		clients.set(groupId, client);
 	});
 
 	sonosNetwork.addListener("groupDestroy", (groupId) => {
-		if(schedulers.has(groupId)) {
-			const scheduler = schedulers.get(groupId);
-			scheduler.stop();
-			schedulers.delete(groupId);
-		}
+		clients.get(groupId).stop();
+		clients.delete(groupId);
 	});
 
 	await sonosNetwork.init();
@@ -57,9 +51,8 @@ const { isProduction } = require("./config");
 	}
 
 	app.use((req, res, next) => {
+		res.locals.clients = clients;
 		res.locals.sonosNetwork = sonosNetwork;
-		res.locals.hubs = hubs,
-
 		next();
 	});
 

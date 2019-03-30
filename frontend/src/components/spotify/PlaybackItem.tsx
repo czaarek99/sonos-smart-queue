@@ -54,10 +54,10 @@ class PlaybackItem extends Component<WithStyles<typeof styles> & IProps> {
 				<div className={classes.albumContainer}>
 					<AlbumArt imgSrc={albumArtUrl} />
 				</div>
-				<Typography className={classes.title}>
+				<Typography className={classes.title} noWrap={true}>
 					{title}
 				</Typography>
-				<Typography className={classes.subtitle}>
+				<Typography className={classes.subtitle} noWrap={true}>
 					{subtitle}
 				</Typography>
 			</div>

@@ -85,7 +85,6 @@ export class SpotifyBrowserController implements ISpotifyBrowserController {
 		await this.appController.getServices()
 			.queueService.addToQueue(
 				token, this.appController.getGroupId(), id, type);
-		await this.appController.refreshQueue();
 	}
 
 	public async onSearch(query: string) : Promise<void> {

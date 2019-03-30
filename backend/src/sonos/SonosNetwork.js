@@ -1,5 +1,6 @@
 const { Sonos, DeviceDiscovery } = require("sonos");
 const EventEmitter = require("events");
+const { Hub } = require("@toverux/expresse");
 
 class SonosNetwork extends EventEmitter {
 
@@ -7,6 +8,7 @@ class SonosNetwork extends EventEmitter {
 		super();
 		this.devices = new Set();
 		this.speakerGroups = new Map();
+		this.groupsHub = new Hub();
 	}
 
 	async startDiscovery() {
@@ -135,9 +137,12 @@ class SonosNetwork extends EventEmitter {
 			});
 		}
 
+		let groupsHaveChanged = false;
+
 		for(const groupId of oldSpeakerGroups.keys()) {
 			if(!this.speakerGroups.has(groupId)) {
 				this.emit("groupDestroy", groupId);
+				groupsHaveChanged = true;
 			}
 		}
 
@@ -145,9 +150,29 @@ class SonosNetwork extends EventEmitter {
 		for(const groupId of this.speakerGroups.keys()) {
 			if(!oldSpeakerGroups.has(groupId)) {
 				this.emit("groupCreate", groupId);
+				groupsHaveChanged = true;
 			}
 		}
 
+		if(groupsHaveChanged) {
+			await this.sendGroupsUpdateEvent(true);
+		}
+
+	}
+
+	getGroupsHub() {
+		return this.groupsHub;
+	}
+
+	async sendGroupsUpdateEvent(useHub, callback) {
+		const eventName = "groupUpdate";
+		const groups = this.getGroupInfo();
+
+		if(useHub) {
+			this.groupsHub.event(eventName, groups)
+		} else {
+			callback(eventName, groups);
+		}
 	}
 
 	getZoneMemberIP(zoneMember) {
