@@ -21,7 +21,7 @@ async function groupIdToSonos(groupId) {
 }
 
 function spotifyUriToSonosUri(uri) {
-	return `x-sonos-spotify:${encodeURIComponent(uri)}?sid=9`;
+	return `x-sonos-spotify:${encodeURIComponent("spotify:track:" + uri)}?sid=9`;
 }
 
 module.exports = {

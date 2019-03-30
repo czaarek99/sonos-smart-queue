@@ -10,8 +10,6 @@ router.get("/list/:groupId", async (req, res) => {
 	const groupId = req.params.groupId;
 	throwIfNotSonosGroupId(groupId);
 
-	const today = new Date(new Date().getTime() - (16 * 60 * 60 * 1000));
-
 	const songs = await database.QueuedSong.findAll({
 		attributes: [
 			"name",
@@ -22,9 +20,6 @@ router.get("/list/:groupId", async (req, res) => {
 		where: {
 			groupId: groupId,
 			state: database.SONG_STATE.QUEUED,
-			queueDate: {
-				[database.Sequelize.Op.gt]: today
-			}
 		},
 		order: [
 			["priority", "DESC"]
@@ -48,8 +43,7 @@ function getAlbumArtUrl(images) {
 
 router.put("/add/:groupId/", async (req, res) => {
 	const groupId = req.params.groupId;
-	//TODO: Add back this check
-	//throwIfNotSonosGroupId(groupId);
+	throwIfNotSonosGroupId(groupId);
 	const id = req.body.id;
 	throwIfNotStringOrEmpty("id", id);
 	const type = req.body.type;
@@ -64,7 +58,7 @@ router.put("/add/:groupId/", async (req, res) => {
 	const priority = 100;
 
 	const baseObject = {
-		state: SONG_STATE.QUEUED,
+		state: database.SONG_STATE.QUEUED,
 		groupId,
 		priority,
 	}

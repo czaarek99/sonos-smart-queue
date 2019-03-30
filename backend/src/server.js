@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const database = require("./database");
 const app = express();
 const SonosClient = require("./client");
+const { spotifyUriToSonosUri } = require("./util/router");
 
 (async function() {
 	await SonosClient.initialize();
@@ -44,5 +45,51 @@ const SonosClient = require("./client");
 		}
 	})
 
+	await database.QueuedSong.update({
+		state: database.SONG_STATE.FINISHED
+	}, {
+		where: {
+			state: database.SONG_STATE.PLAYING
+		}
+	});
+
 	app.listen(5000);
+
+	console.log(SonosClient.getSpeakerGroups());
+
+	for(const groupId of SonosClient.getSpeakerGroups().keys()) {
+		playOnGroup(groupId)
+	}
 })();
+
+async function playOnGroup(groupId) {
+	console.log("play on group");
+	const song = await database.QueuedSong.findOne({
+		where: {
+			groupId: groupId,
+			state: database.SONG_STATE.QUEUED
+		},
+		order: [
+			["priority", "DESC"]
+		],
+	});
+
+	if(song === null) {
+		console.log("no song")
+		setTimeout(playOnGroup, 500);
+	} else {
+		console.log("found song")
+		await SonosClient.playSong(groupId, spotifyUriToSonosUri(song.spotifyId), () => {
+			console.log("IMMEDIATE!")
+			setImmediate(playOnGroup);
+		});
+
+		await database.QueuedSong.update({
+			state: database.SONG_STATE.PLAYING
+		}, {
+			where: {
+				id: song.id,
+			}
+		})
+	}
+}

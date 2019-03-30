@@ -4,7 +4,8 @@ class SonosClient {
 
 	constructor() {
 		this.speakerGroups = new Map();
-		this.currentlyPlaying = new Map();
+		this.states = new Map();
+		this.listeners = new Map();
 	}
 
 	async getMainDevice() {
@@ -16,7 +17,7 @@ class SonosClient {
 	}
 
 	async initialize() {
-		this.recache();
+		await this.recache();
 
 		setInterval(() => {
 			this.recache();
@@ -31,10 +32,6 @@ class SonosClient {
 		return this.speakerGroups.get(groupId);
 	}
 
-	getCurrentlyPlaying(groupId) {
-		return this.currentlyPlaying.get(groupId);
-	}
-
 	getCoordinatorByGroupId(groupId) {
 		const device = this.getDeviceByGroupId(groupId);
 		if(device === null) {
@@ -44,13 +41,32 @@ class SonosClient {
 		}
 	}
 
+	getPlaybackState(groupId) {
+		const state = this.states.get(groupId);
+
+		if(state === null) {
+			return "stopped"
+		} else {
+			return state;
+		}
+	}
+
+	async playSong(groupId, songUri, onFinish) {
+		const coordinator = this.getCoordinatorByGroupId(groupId);
+		this.states.set(groupId, "playing");
+		await coordinator.flush();
+		await coordinator.play(songUri);
+
+		coordinator.once("PlaybackStopped", () => {
+			console.log("STOPPED BRO")
+			this.states.set(groupId, "stopped");
+			onFinish();
+		});
+	}
+
 	async recache() {
 		const mainDevice = await this.getMainDevice();
 		const groups = await mainDevice.getAllGroups();
-
-		for(const device of this.speakerGroups.values()) {
-			device.coordinator.removeListener("CurrentTrack", device.trackListener)
-		}
 
 		this.speakerGroups.clear();
 
@@ -86,21 +102,9 @@ class SonosClient {
 
 			const coordinator = new Sonos(coordinatorUrl);
 
-			const onCurrentTrack = (track) => {
-				this.currentlyPlaying.set(groupId, {
-					name: track.title,
-					artistName: track.artist,
-					duration: track.duration,
-					albumArtUrl: track.albumArtURI
-				})
-			}
-
-			coordinator.addListener("CurrentTrack", onCurrentTrack)
-
 			this.speakerGroups.set(groupId, {
 				coordinator,
-				members,
-				trackListener: onCurrentTrack
+				members
 			})
 		}
 	}
