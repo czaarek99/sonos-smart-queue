@@ -1,28 +1,20 @@
 const { Hub } = require("@toverux/expresse");
+const EventEmitter = require("events");
 const database = require("../database");
 
 const MAX_QUEUE_RETURN = 50;
 
-class SonosClient {
+class SonosClient extends EventEmitter {
 
 	constructor(coordinator, groupId) {
 		this.coordinator = coordinator;
 		this.groupId = groupId;
-		this.queueHub = new Hub();
-		this.controlHub = new Hub();
 		this.playing = false;
+		this.destroyed = false;
 	}
 
 	spotifyUriToSonosUri(uri) {
 		return `x-sonos-spotify:${encodeURIComponent("spotify:track:" + uri)}?sid=9`;
-	}
-
-	getQueueHub() {
-		return this.queueHub;
-	}
-
-	getControlHub() {
-		return this.controlHub;
 	}
 
 	async play() {
@@ -39,6 +31,12 @@ class SonosClient {
 
 	async stop() {
 		await this.coordinator.flush();
+	}
+
+	async destroy() {
+		this.removeAllListeners();
+		this.destroyed = true;
+		this.emit("destroy");
 	}
 
 	async getVolume() {
@@ -62,6 +60,22 @@ class SonosClient {
 
 		//Max volume is 50% of sonos max volume
 		await this.coordinator.setVolume(volume / 2);
+		await this.emitVolumeUpdateEvent();
+	}
+
+	async emitVolumeUpdateEvent() {
+		const volume = await getVolume();
+		this.emit("volumeUpdate", volume);
+	}
+
+	async emitQueueUpdateEvent() {
+		const queue = await this.getQueue();
+		this.emit("queueUpdate", queue);
+	}
+
+	async emitCurrentlyPlayingEvent() {
+		const playing = await this.getCurrentlyPlaying();
+		this.emit("currentlyPlaying", playing)
 	}
 
 	getAlbumArtUrl(images) {
@@ -131,7 +145,7 @@ class SonosClient {
 		}
 
 		await database.QueuedSong.bulkCreate(songsToInsert);
-		await this.sendQueueUpdateEvent(true);
+		await this.emitQueueUpdateEvent();
 
 		if(!this.playing) {
 			this.playNext();
@@ -230,8 +244,8 @@ class SonosClient {
 			});
 
 			await Promise.all([
-				this.sendPlayingUpdateEvent(true),
-				this.sendQueueUpdateEvent(true),
+				this.emitCurrentlyPlayingEvent(),
+				this.emitQueueUpdateEvent(),
 				this.playSong(sonosUri)
 			]);
 
@@ -244,7 +258,9 @@ class SonosClient {
 			});
 
 			setImmediate(() => {
-				this.playNext();
+				if(!this.destroyed) {
+					this.playNext();
+				}
 			});
 		} 
 	}

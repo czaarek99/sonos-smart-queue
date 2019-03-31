@@ -10,8 +10,5 @@ export interface ISpeakerGroup {
 	speakers: ISpeaker[]
 }
 
-export type SpeakersCallback = (speakerGroups: ISpeakerGroup[]) => void
-
 export interface IInfoService {
-	setGroupUpdateCallback: (callback: SpeakersCallback) => void
 }

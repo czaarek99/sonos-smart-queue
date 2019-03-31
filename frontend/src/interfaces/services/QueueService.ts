@@ -7,9 +7,6 @@ export enum QueueItemType {
 	ARTIST = "artist"
 } 
 
-export type QueueCallback = (songs: ISong[]) => void
-
 export interface IQueueService {
-	setQueueUpdateCallback: (groupId: string, callback: QueueCallback) => void
 	addToQueue: (spotifyToken: string, groupId: string, id: string, type: QueueItemType) => Promise<void>
 }

@@ -2,7 +2,6 @@
 	"name": "sonos-smart-queue-backend",
 	"version": "0.1.0",
 	"dependencies": {
-		"@toverux/expresse": "^2.4.0",
 		"bcrypt": "^3.0.3",
 		"body-parser": "^1.18.3",
 		"connect-session-sequelize": "^6.0.0",
@@ -18,7 +17,8 @@
 		"sequelize": "^4.42.0",
 		"sonos": "^1.9.0",
 		"spotify-web-api-node": "^4.0.0",
-		"uuid": "^3.3.2"
+		"uuid": "^3.3.2",
+		"ws": "^6.2.1"
 	},
 	"devDependencies": {
 		"nodemon": "^1.18.9"

@@ -2,7 +2,7 @@ import { KeyStore } from "../storage/KeyStore";
 import { observable, computed } from "mobx";
 import { IAuthenticationService } from "../interfaces/services/AuthenticationService";
 import { IQueueService } from "../interfaces/services/QueueService";
-import { IInfoService, ISpeakerGroup } from "../interfaces/services/InfoService";
+import { IInfoService, ISpeakerGroup, ISpeaker } from "../interfaces/services/InfoService";
 import { ISpotifyService } from "../interfaces/services/SpotifyService";
 import { AuthenticationService } from "../services/AuthenticationService";
 import { QueueService } from "../services/QueueService";
@@ -11,7 +11,8 @@ import { SpotifyService } from "../services/SpotifyService";
 import { SmartQueueController } from "./SmartQueueController";
 import { ISong } from "../interfaces/Song";
 import { ControlService } from "../services/ControlService";
-import { IControlService, IPlaying } from "../interfaces/services/ControlService";
+import { IControlService } from "../interfaces/services/ControlService";
+import { EventClient } from "../services/events/EventClient";
 
 interface IGlobalData {
 	accessToken: string
@@ -30,6 +31,8 @@ export class AppController {
 	private services: IServices;
 	private accessToken: string;
 	private firstGroup = true;
+	private eventClient: EventClient;
+
 	@observable private groupId = null;
 	@observable private queueItems: ISong[] = [];
 	@observable private currentlyPlaying: ISong = null;
@@ -62,6 +65,16 @@ export class AppController {
 		this.globalStorage.setKeyValue("accessToken", token);
 		this.accessToken = token;
 		this.createServices();
+		this.eventClient = new EventClient(token);
+
+		this.eventClient.addEventListener("groupUpdate", (groups: ISpeakerGroup[]) => {
+			if(this.firstGroup) {
+				this.firstGroup = false;
+				this.setGroupId(groups[0].id);
+			}
+
+			this.speakerGroups = groups;
+		});
 
 		this.loggedIn = true;
 	}
@@ -90,14 +103,6 @@ export class AppController {
 
 	public setGroupId(id: string) {
 		this.groupId = id;
-
-		this.services.controlService.setPlayingUpdateCallback(id, (playing: IPlaying) => {
-			this.currentlyPlaying = playing.playing;
-		});
-
-		this.services.queueService.setQueueUpdateCallback(id, (songs: ISong[]) => {
-			this.queueItems = songs;
-		});
 	}
 
 	private async load() : Promise<void> {
@@ -105,14 +110,11 @@ export class AppController {
 			try {
 				await this.services.authenticationService.verifyToken();
 
-				this.services.infoService.setGroupUpdateCallback((groups: ISpeakerGroup[]) => {
-					if(this.firstGroup) {
-						this.firstGroup = false;
-						this.setGroupId(groups[0].id);
-					}
+				this.globalEventClient = new EventClient(this.accessToken, "");
 
-					this.speakerGroups = groups;
-				});
+				this.globalEventClient.addEventListener("groupUpdate", (groups: ISpeakerGroup[]) => {
+
+				}) 
 			} catch(error) {
 				this.loggedIn = false;
 			}

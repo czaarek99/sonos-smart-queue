@@ -17,14 +17,16 @@
 		"react-swipeable-views": "^0.13.1",
 		"spotify-web-api-node": "^4.0.0",
 		"typeface-roboto": "0.0.54",
-		"typescript": "3.3.3333"
+		"typescript": "3.3.3333",
+		"ws": "^6.2.1"
 	},
 	"devDependencies": {
 		"@types/jest": "24.0.6",
 		"@types/node": "11.9.4",
 		"@types/react": "16.8.4",
 		"@types/react-dom": "16.8.2",
-		"@types/react-jss": "^8.6.2"
+		"@types/react-jss": "^8.6.2",
+		"@types/ws": "^6.0.1"
 	},
 	"scripts": {
 		"start": "react-scripts start",
